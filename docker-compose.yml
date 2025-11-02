@@ -19,8 +19,10 @@ services:
       - VITE_PORT=3000
     stdin_open: true
     tty: true
+    profiles:
+      - dev
 
-  # Production service
+  # Production service (default for Coolify)
   prod:
     build:
       context: .
@@ -44,3 +46,5 @@ services:
       - ./dist:/app/dist
     environment:
       - NODE_ENV=production
+    profiles:
+      - build
