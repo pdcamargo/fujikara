@@ -1,15 +1,19 @@
 import { ArrowDown, ArrowUp, ChevronUp } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
+import { Button } from './ui/button'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from './ui/tooltip'
 import type { SectionData } from '@/lib/mdx-transformers'
 
 import { useActiveSection } from '@/hooks/use-active-section'
 import { useIsMobile } from '@/hooks/use-mobile'
 import { useScrollPosition } from '@/hooks/use-scroll-position'
 import { cn } from '@/lib/utils'
-
-import { Button } from './ui/button'
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip'
 
 interface FloatingNavigationProps {
   /**

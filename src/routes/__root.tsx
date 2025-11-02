@@ -3,6 +3,7 @@ import { HeadContent, Scripts, createRootRoute } from '@tanstack/react-router'
 // import { TanStackDevtools } from '@tanstack/react-devtools'
 
 import appCss from '../styles.css?url'
+import { CommandPaletteTrigger, DocumentCommandPalette } from '@/components/document-command-palette'
 
 export const Route = createRootRoute({
   head: () => ({
@@ -37,6 +38,9 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       </head>
       <body className="dark">
         {children}
+        <DocumentCommandPalette>
+          <CommandPaletteTrigger />
+        </DocumentCommandPalette>
         {/* <TanStackDevtools
           config={{
             position: 'bottom-right',
