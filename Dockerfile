@@ -29,6 +29,7 @@ RUN adduser --system --uid 1001 react
 # Copy built application
 COPY --from=builder --chown=react:nodejs /app/dist ./dist
 COPY --from=builder --chown=react:nodejs /app/public ./public
+COPY --from=builder --chown=react:nodejs /app/.content-collections ./.content-collections
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/server-start.mjs ./server-start.mjs
