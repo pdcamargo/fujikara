@@ -140,6 +140,10 @@ code {
 .sidepanel {
   @apply w-full text-xs bg-gray-100;
   @apply dark:bg-gray-800;
+}
+
+/* Only apply width constraints on desktop (not inside Sheet) */
+.sidepanel:not([data-sheet-content] *) {
   max-width: 400px;
   min-width: 400px;
 }
