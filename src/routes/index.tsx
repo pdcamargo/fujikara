@@ -97,6 +97,23 @@ const sortCategories = (categories: Array<string>): Array<string> => {
   })
 }
 
+// Sort documents by last name (last word) from title
+const sortDocumentsByLastName = (
+  documents: Array<DocWithSlug>,
+): Array<DocWithSlug> => {
+  return [...documents].sort((a, b) => {
+    const getLastName = (title: string) => {
+      const words = title.trim().split(/\s+/)
+      return words[words.length - 1]
+    }
+
+    const lastNameA = getLastName(a.title)
+    const lastNameB = getLastName(b.title)
+
+    return lastNameA.localeCompare(lastNameB)
+  })
+}
+
 export const Route = createFileRoute('/')({
   component: WikiIndex,
   beforeLoad() {
@@ -172,7 +189,7 @@ function CategoryTree({
         {/* Documents in this category */}
         {hasDocuments && (
           <div className="space-y-0.5">
-            {category.docs.map((doc) => (
+            {sortDocumentsByLastName(category.docs).map((doc) => (
               <DocumentItem key={doc._meta.path} doc={doc} level={level + 1} />
             ))}
           </div>
