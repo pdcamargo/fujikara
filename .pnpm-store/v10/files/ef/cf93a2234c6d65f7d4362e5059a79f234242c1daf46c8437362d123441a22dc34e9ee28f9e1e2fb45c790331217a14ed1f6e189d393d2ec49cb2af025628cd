@@ -1,0 +1,1386 @@
+// src/builder.ts
+import path9 from "node:path";
+
+// src/cache.ts
+import { createHash } from "node:crypto";
+import { existsSync } from "node:fs";
+import { mkdir, readFile, unlink, writeFile } from "node:fs/promises";
+import path, { join } from "node:path";
+function createKey(config, input, key) {
+  return createHash("sha256").update(config).update(JSON.stringify(input)).update(key).digest("hex");
+}
+async function createCacheDirectory(directory) {
+  const cacheDirectory = path.join(directory, ".content-collections", "cache");
+  if (!existsSync(cacheDirectory)) {
+    await mkdir(cacheDirectory, { recursive: true });
+  }
+  return cacheDirectory;
+}
+function fileName(input) {
+  return input.replace(/[^a-z0-9]/gi, "_").toLowerCase();
+}
+async function readMapping(mappingPath) {
+  if (existsSync(mappingPath)) {
+    try {
+      return JSON.parse(await readFile(mappingPath, "utf-8"));
+    } catch (e) {
+      console.error(
+        "Failed to parse the cache mapping. We will recreate the cache."
+      );
+    }
+  }
+  return {};
+}
+async function createCacheManager(baseDirectory, configChecksum) {
+  const cacheDirectory = await createCacheDirectory(baseDirectory);
+  const mappingPath = join(cacheDirectory, "mapping.json");
+  const mapping = await readMapping(mappingPath);
+  async function flush() {
+    await writeFile(mappingPath, JSON.stringify(mapping));
+  }
+  function cache(collection, file) {
+    const directory = join(
+      cacheDirectory,
+      fileName(collection),
+      fileName(file)
+    );
+    let collectionMapping = mapping[collection];
+    if (!collectionMapping) {
+      collectionMapping = {};
+      mapping[collection] = collectionMapping;
+    }
+    let fileMapping = collectionMapping[file];
+    if (!fileMapping) {
+      fileMapping = [];
+      collectionMapping[file] = fileMapping;
+    }
+    let newFileMapping = [];
+    const cacheFn = async (input, fn, options) => {
+      const key = createKey(configChecksum, input, options?.key || "");
+      newFileMapping.push(key);
+      const filePath = join(directory, `${key}.cache`);
+      if (fileMapping?.includes(key) || newFileMapping.includes(key)) {
+        if (existsSync(filePath)) {
+          try {
+            return JSON.parse(await readFile(filePath, "utf-8"));
+          } catch (e) {
+            console.error(
+              "Failed to parse the cache file. We will recompute the value."
+            );
+          }
+        }
+      }
+      const output = await fn(input);
+      if (!existsSync(directory)) {
+        await mkdir(directory, { recursive: true });
+      }
+      await writeFile(filePath, JSON.stringify(output));
+      return output;
+    };
+    const tidyUp = async () => {
+      const filesToDelete = fileMapping?.filter((key) => !newFileMapping.includes(key)) || [];
+      for (const key of filesToDelete) {
+        const filePath = join(directory, `${key}.cache`);
+        if (existsSync(filePath)) {
+          await unlink(filePath);
+        }
+      }
+      if (collectionMapping) {
+        collectionMapping[file] = newFileMapping;
+      }
+    };
+    return {
+      cacheFn,
+      tidyUp
+    };
+  }
+  return {
+    cache,
+    flush
+  };
+}
+
+// src/collector.ts
+import { readFile as readFile2 } from "fs/promises";
+import path3 from "node:path";
+import { glob } from "tinyglobby";
+
+// src/parser.ts
+import matter from "gray-matter";
+import { parse, stringify } from "yaml";
+function parseYaml(content) {
+  return parse(content.trim());
+}
+function frontmatter(fileContent) {
+  return matter(fileContent, {
+    engines: {
+      yaml: {
+        parse: parseYaml,
+        stringify
+      }
+    }
+  });
+}
+function frontmatterParser(fileContent) {
+  const { data, content } = frontmatter(fileContent);
+  return {
+    ...data,
+    content: content.trim()
+  };
+}
+function frontmatterOnlyParser(fileContent) {
+  const { data } = frontmatter(fileContent);
+  return data;
+}
+var parsers = {
+  frontmatter: {
+    hasContent: true,
+    parse: frontmatterParser
+  },
+  ["frontmatter-only"]: {
+    hasContent: false,
+    parse: frontmatterOnlyParser
+  },
+  json: {
+    hasContent: false,
+    parse: JSON.parse
+  },
+  yaml: {
+    hasContent: false,
+    parse: parseYaml
+  }
+};
+function getParser(configuredParser) {
+  if (typeof configuredParser === "string") {
+    return parsers[configuredParser];
+  }
+  return configuredParser;
+}
+function defineParser(parser) {
+  if (typeof parser === "function") {
+    return {
+      hasContent: false,
+      parse: parser
+    };
+  }
+  return parser;
+}
+function isValidParser(parser) {
+  if (typeof parser === "string") {
+    return parser in parsers;
+  }
+  return "hasContent" in parser && typeof parser.parse === "function";
+}
+
+// src/utils.ts
+import camelcase from "camelcase";
+import pluralize from "pluralize";
+import path2 from "node:path";
+function generateTypeName(name) {
+  const singularName = pluralize.singular(name);
+  return camelcase(singularName, { pascalCase: true });
+}
+function isDefined(value) {
+  return value !== void 0 && value !== null;
+}
+function orderByPath(a, b) {
+  return a.path.localeCompare(b.path);
+}
+function removeChildPaths(paths) {
+  return Array.from(
+    new Set(
+      paths.filter((path10) => {
+        return !paths.some((otherPath) => {
+          if (path10 === otherPath) {
+            return false;
+          }
+          return path10.startsWith(otherPath);
+        });
+      })
+    )
+  );
+}
+function posixToNativePath(pathName) {
+  if (path2.sep !== path2.posix.sep) {
+    return pathName.replaceAll(path2.posix.sep, path2.sep);
+  }
+  return pathName;
+}
+function toError(error) {
+  return error instanceof Error ? error : new Error(String(error));
+}
+
+// src/collector.ts
+var CollectError = class extends Error {
+  type;
+  constructor(type, message) {
+    super(message);
+    this.type = type;
+  }
+};
+function createCollector(emitter, baseDirectory = ".") {
+  async function read(filePath) {
+    try {
+      return await readFile2(filePath, "utf-8");
+    } catch (error) {
+      emitter.emit("collector:read-error", {
+        filePath,
+        error: new CollectError("Read", String(error))
+      });
+      return null;
+    }
+  }
+  async function collectFile(collection, filePath) {
+    const absolutePath = path3.join(
+      baseDirectory,
+      collection.directory,
+      filePath
+    );
+    const file = await read(absolutePath);
+    if (!file) {
+      return null;
+    }
+    try {
+      const parser = getParser(collection.parser);
+      const data = await parser.parse(file);
+      return {
+        data,
+        path: filePath
+      };
+    } catch (error) {
+      emitter.emit("collector:parse-error", {
+        filePath: path3.join(collection.directory, filePath),
+        error: new CollectError("Parse", String(error))
+      });
+      return null;
+    }
+  }
+  function createIgnorePattern(collection) {
+    if (collection.exclude) {
+      if (Array.isArray(collection.exclude)) {
+        return collection.exclude;
+      } else {
+        return [collection.exclude];
+      }
+    }
+    return void 0;
+  }
+  async function resolveCollection(collection) {
+    const collectionDirectory = path3.join(baseDirectory, collection.directory);
+    const include = Array.isArray(collection.include) ? collection.include : [collection.include];
+    const filePaths = await glob(include, {
+      cwd: collectionDirectory,
+      onlyFiles: true,
+      absolute: false,
+      ignore: createIgnorePattern(collection)
+    });
+    const promises = filePaths.map(
+      (filePath) => collectFile(collection, posixToNativePath(filePath))
+    );
+    const files = await Promise.all(promises);
+    return {
+      ...collection,
+      files: files.filter(isDefined).sort(orderByPath)
+    };
+  }
+  async function collect(unresolvedCollections) {
+    const promises = unresolvedCollections.map(
+      (collection) => resolveCollection(collection)
+    );
+    return await Promise.all(promises);
+  }
+  return {
+    collect,
+    collectFile
+  };
+}
+
+// src/synchronizer.ts
+import path4 from "node:path";
+import picomatch from "picomatch";
+function createSynchronizer(readCollectionFile, collections, baseDirectory = ".") {
+  function findCollections(filePath) {
+    const resolvedFilePath = path4.resolve(filePath);
+    return collections.filter((collection) => {
+      return resolvedFilePath.startsWith(
+        path4.resolve(baseDirectory, collection.directory)
+      );
+    });
+  }
+  function createRelativePath(collectionPath, filePath) {
+    const resolvedCollectionPath = path4.resolve(baseDirectory, collectionPath);
+    const resolvedFilePath = path4.resolve(filePath);
+    let relativePath = resolvedFilePath.slice(resolvedCollectionPath.length);
+    if (relativePath.startsWith(path4.sep)) {
+      relativePath = relativePath.slice(path4.sep.length);
+    }
+    return relativePath;
+  }
+  function resolve2(filePath) {
+    const collections2 = findCollections(filePath);
+    return collections2.map((collection) => {
+      const relativePath = createRelativePath(collection.directory, filePath);
+      return {
+        collection,
+        relativePath
+      };
+    }).filter(({ collection, relativePath }) => {
+      return picomatch.isMatch(relativePath, collection.include, {
+        // @see https://github.com/sdorra/content-collections/issues/602
+        windows: process.platform === "win32",
+        ignore: collection.exclude
+      });
+    });
+  }
+  function deleted(filePath) {
+    const resolvedCollections = resolve2(filePath);
+    if (resolvedCollections.length === 0) {
+      return false;
+    }
+    let changed2 = false;
+    for (const { collection, relativePath } of resolvedCollections) {
+      const index = collection.files.findIndex(
+        (file) => file.path === relativePath
+      );
+      const deleted2 = collection.files.splice(index, 1);
+      if (deleted2.length > 0) {
+        changed2 = true;
+      }
+    }
+    return changed2;
+  }
+  async function changed(filePath) {
+    const resolvedCollections = resolve2(filePath);
+    if (resolvedCollections.length === 0) {
+      return false;
+    }
+    let changed2 = false;
+    for (const { collection, relativePath } of resolvedCollections) {
+      const index = collection.files.findIndex(
+        (file2) => file2.path === relativePath
+      );
+      const file = await readCollectionFile(collection, relativePath);
+      if (file) {
+        changed2 = true;
+        if (index === -1) {
+          collection.files.push(file);
+          collection.files.sort(orderByPath);
+        } else {
+          collection.files[index] = file;
+        }
+      }
+    }
+    return changed2;
+  }
+  return {
+    deleted,
+    changed
+  };
+}
+
+// src/transformer.ts
+import os from "node:os";
+import { basename, dirname as dirname2, extname, join as join3 } from "node:path";
+import pLimit from "p-limit";
+
+// src/config.ts
+import { z } from "zod";
+
+// src/warn.ts
+var deprecations = {
+  legacySchema: `The use of a function as a schema is deprecated.
+Please use a StandardSchema compliant library directly.
+For more information, see:
+https://content-collections.dev/docs/deprecations/schema-as-function`
+};
+var _suppressDeprecatedWarnings = [];
+function suppressDeprecatedWarnings(...suppresses) {
+  for (const deprecation of suppresses) {
+    if (deprecation === "all") {
+      _suppressDeprecatedWarnings.push(
+        ...Object.keys(deprecations)
+      );
+      return;
+    } else {
+      _suppressDeprecatedWarnings.push(deprecation);
+    }
+  }
+}
+function warnDeprecated(deprecation, logger = console.warn) {
+  if (_suppressDeprecatedWarnings.includes(deprecation)) {
+    return;
+  }
+  logger(`[CC DEPRECATED]: ${deprecations[deprecation]}`);
+}
+
+// src/configurationReader.ts
+import { createHash as createHash2 } from "node:crypto";
+import { existsSync as existsSync2 } from "node:fs";
+import fs2 from "node:fs/promises";
+import path6 from "node:path";
+
+// ../../node_modules/.pnpm/bundle-require@5.0.0_esbuild@0.25.6/node_modules/bundle-require/dist/index.js
+import {
+  build,
+  context
+} from "esbuild";
+
+// ../../node_modules/.pnpm/load-tsconfig@0.2.5/node_modules/load-tsconfig/dist/index.js
+import path5 from "path";
+import fs from "fs";
+import { createRequire } from "module";
+var singleComment = Symbol("singleComment");
+var multiComment = Symbol("multiComment");
+var stripWithoutWhitespace = () => "";
+var stripWithWhitespace = (string, start, end) => string.slice(start, end).replace(/\S/g, " ");
+var isEscaped = (jsonString, quotePosition) => {
+  let index = quotePosition - 1;
+  let backslashCount = 0;
+  while (jsonString[index] === "\\") {
+    index -= 1;
+    backslashCount += 1;
+  }
+  return Boolean(backslashCount % 2);
+};
+function stripJsonComments(jsonString, { whitespace = true, trailingCommas = false } = {}) {
+  if (typeof jsonString !== "string") {
+    throw new TypeError(`Expected argument \`jsonString\` to be a \`string\`, got \`${typeof jsonString}\``);
+  }
+  const strip = whitespace ? stripWithWhitespace : stripWithoutWhitespace;
+  let isInsideString = false;
+  let isInsideComment = false;
+  let offset = 0;
+  let buffer = "";
+  let result = "";
+  let commaIndex = -1;
+  for (let index = 0; index < jsonString.length; index++) {
+    const currentCharacter = jsonString[index];
+    const nextCharacter = jsonString[index + 1];
+    if (!isInsideComment && currentCharacter === '"') {
+      const escaped = isEscaped(jsonString, index);
+      if (!escaped) {
+        isInsideString = !isInsideString;
+      }
+    }
+    if (isInsideString) {
+      continue;
+    }
+    if (!isInsideComment && currentCharacter + nextCharacter === "//") {
+      buffer += jsonString.slice(offset, index);
+      offset = index;
+      isInsideComment = singleComment;
+      index++;
+    } else if (isInsideComment === singleComment && currentCharacter + nextCharacter === "\r\n") {
+      index++;
+      isInsideComment = false;
+      buffer += strip(jsonString, offset, index);
+      offset = index;
+      continue;
+    } else if (isInsideComment === singleComment && currentCharacter === "\n") {
+      isInsideComment = false;
+      buffer += strip(jsonString, offset, index);
+      offset = index;
+    } else if (!isInsideComment && currentCharacter + nextCharacter === "/*") {
+      buffer += jsonString.slice(offset, index);
+      offset = index;
+      isInsideComment = multiComment;
+      index++;
+      continue;
+    } else if (isInsideComment === multiComment && currentCharacter + nextCharacter === "*/") {
+      index++;
+      isInsideComment = false;
+      buffer += strip(jsonString, offset, index + 1);
+      offset = index + 1;
+      continue;
+    } else if (trailingCommas && !isInsideComment) {
+      if (commaIndex !== -1) {
+        if (currentCharacter === "}" || currentCharacter === "]") {
+          buffer += jsonString.slice(offset, index);
+          result += strip(buffer, 0, 1) + buffer.slice(1);
+          buffer = "";
+          offset = index;
+          commaIndex = -1;
+        } else if (currentCharacter !== " " && currentCharacter !== "	" && currentCharacter !== "\r" && currentCharacter !== "\n") {
+          buffer += jsonString.slice(offset, index);
+          offset = index;
+          commaIndex = -1;
+        }
+      } else if (currentCharacter === ",") {
+        result += buffer + jsonString.slice(offset, index);
+        buffer = "";
+        offset = index;
+        commaIndex = index;
+      }
+    }
+  }
+  return result + buffer + (isInsideComment ? strip(jsonString.slice(offset)) : jsonString.slice(offset));
+}
+function jsoncParse(data) {
+  try {
+    return new Function("return " + stripJsonComments(data).trim())();
+  } catch (_) {
+    return {};
+  }
+}
+var req = true ? createRequire(import.meta.url) : __require;
+var findUp = (name, startDir, stopDir = path5.parse(startDir).root) => {
+  let dir = startDir;
+  while (dir !== stopDir) {
+    const file = path5.join(dir, name);
+    if (fs.existsSync(file))
+      return file;
+    if (!file.endsWith(".json")) {
+      const fileWithExt = file + ".json";
+      if (fs.existsSync(fileWithExt))
+        return fileWithExt;
+    }
+    dir = path5.dirname(dir);
+  }
+  return null;
+};
+var resolveTsConfigFromFile = (cwd, filename) => {
+  if (path5.isAbsolute(filename))
+    return fs.existsSync(filename) ? filename : null;
+  return findUp(filename, cwd);
+};
+var resolveTsConfigFromExtends = (cwd, name) => {
+  if (path5.isAbsolute(name))
+    return fs.existsSync(name) ? name : null;
+  if (name.startsWith("."))
+    return findUp(name, cwd);
+  const id = req.resolve(name, { paths: [cwd] });
+  return id;
+};
+var loadTsConfigInternal = (dir = process.cwd(), name = "tsconfig.json", isExtends = false) => {
+  var _a, _b;
+  dir = path5.resolve(dir);
+  const id = isExtends ? resolveTsConfigFromExtends(dir, name) : resolveTsConfigFromFile(dir, name);
+  if (!id)
+    return null;
+  const data = jsoncParse(fs.readFileSync(id, "utf-8"));
+  const configDir = path5.dirname(id);
+  if ((_a = data.compilerOptions) == null ? void 0 : _a.baseUrl) {
+    data.compilerOptions.baseUrl = path5.join(
+      configDir,
+      data.compilerOptions.baseUrl
+    );
+  }
+  let extendsFiles = [];
+  if (data.extends) {
+    const extendsList = Array.isArray(data.extends) ? data.extends : [data.extends];
+    const extendsData = {};
+    for (const name2 of extendsList) {
+      const parentConfig = loadTsConfigInternal(configDir, name2, true);
+      if (parentConfig) {
+        Object.assign(extendsData, {
+          ...parentConfig == null ? void 0 : parentConfig.data,
+          compilerOptions: {
+            ...extendsData.compilerOptions,
+            ...(_b = parentConfig == null ? void 0 : parentConfig.data) == null ? void 0 : _b.compilerOptions
+          }
+        });
+        extendsFiles.push(...parentConfig.files);
+      }
+    }
+    Object.assign(data, {
+      ...extendsData,
+      ...data,
+      compilerOptions: {
+        ...extendsData.compilerOptions,
+        ...data.compilerOptions
+      }
+    });
+  }
+  delete data.extends;
+  return { path: id, data, files: [...extendsFiles, id] };
+};
+var loadTsConfig = (dir, name) => loadTsConfigInternal(dir, name);
+
+// ../../node_modules/.pnpm/bundle-require@5.0.0_esbuild@0.25.6/node_modules/bundle-require/dist/index.js
+var tsconfigPathsToRegExp = (paths) => {
+  return Object.keys(paths || {}).map((key) => {
+    return new RegExp(`^${key.replace(/\*/, ".*")}$`);
+  });
+};
+var match = (id, patterns) => {
+  if (!patterns)
+    return false;
+  return patterns.some((p) => {
+    if (p instanceof RegExp) {
+      return p.test(id);
+    }
+    return id === p || id.startsWith(p + "/");
+  });
+};
+
+// src/esbuild.ts
+import { build as build2 } from "esbuild";
+import { dirname, join as join2 } from "node:path";
+function tsconfigResolvePaths(configPath) {
+  let tsconfig = loadTsConfig(dirname(configPath));
+  if (!tsconfig) {
+    tsconfig = loadTsConfig();
+  }
+  return tsconfig?.data?.compilerOptions?.paths || {};
+}
+var NON_NODE_MODULE_RE = /^[A-Z]:[/\\]|^\.{0,2}\/|^\.{1,2}$/;
+function createExternalsPlugin(configPath) {
+  const resolvedPaths = tsconfigResolvePaths(configPath);
+  const resolvePatterns = tsconfigPathsToRegExp(resolvedPaths);
+  return {
+    name: "external-packages",
+    setup: (build4) => {
+      build4.onResolve({ filter: /.*/ }, ({ path: path10, kind }) => {
+        if (match(path10, resolvePatterns)) {
+          if (kind === "dynamic-import") {
+            return { path: path10, external: true };
+          }
+          return;
+        }
+        if (!NON_NODE_MODULE_RE.test(path10)) {
+          return {
+            path: path10,
+            external: true
+          };
+        }
+      });
+    }
+  };
+}
+var importPathPlugin = {
+  name: "import-path",
+  setup(build4) {
+    build4.onResolve({ filter: /^\@content-collections\/core$/ }, () => {
+      return { path: join2(__dirname, "index.ts"), external: true };
+    });
+  }
+};
+async function compile(configurationPath, outfile) {
+  const plugins = [createExternalsPlugin(configurationPath)];
+  if (process.env.NODE_ENV === "test") {
+    plugins.push(importPathPlugin);
+  }
+  const result = await build2({
+    entryPoints: [configurationPath],
+    packages: "external",
+    bundle: true,
+    platform: "node",
+    format: "esm",
+    plugins,
+    outfile,
+    metafile: true
+  });
+  return Object.keys(result.metafile.inputs);
+}
+
+// src/configurationReader.ts
+var ConfigurationError = class extends Error {
+  type;
+  constructor(type, message) {
+    super(message);
+    this.type = type;
+  }
+};
+var defaultConfigName = "content-collection-config.mjs";
+function resolveCacheDir(config, options) {
+  if (options.cacheDir) {
+    return options.cacheDir;
+  }
+  return path6.join(path6.dirname(config), ".content-collections", "cache");
+}
+function createConfigurationReader() {
+  return async (configurationPath, options = {
+    configName: defaultConfigName
+  }) => {
+    if (!existsSync2(configurationPath)) {
+      throw new ConfigurationError(
+        "Read",
+        `configuration file ${configurationPath} does not exist`
+      );
+    }
+    const cacheDir = resolveCacheDir(configurationPath, options);
+    await fs2.mkdir(cacheDir, { recursive: true });
+    const outfile = path6.join(cacheDir, options.configName);
+    try {
+      const configurationPaths = await compile(configurationPath, outfile);
+      const module = await import(`file://${path6.resolve(outfile)}?x=${Date.now()}`);
+      const hash = createHash2("sha256");
+      hash.update(await fs2.readFile(outfile, "utf-8"));
+      const checksum = hash.digest("hex");
+      return {
+        ...module.default,
+        path: configurationPath,
+        inputPaths: configurationPaths.map((p) => path6.resolve(p)),
+        generateTypes: true,
+        checksum
+      };
+    } catch (error) {
+      throw new ConfigurationError(
+        "Compile",
+        `configuration file ${configurationPath} is invalid: ${error}`
+      );
+    }
+  };
+}
+
+// src/config.ts
+var skippedSymbol = Symbol("skipped");
+var InvalidReturnTypeSymbol = Symbol(`InvalidReturnType`);
+function defineCollection(collection) {
+  let typeName = collection.typeName;
+  if (!typeName) {
+    typeName = generateTypeName(collection.name);
+  }
+  let parser = collection.parser;
+  if (!parser) {
+    parser = "frontmatter";
+  } else if (!isValidParser(parser)) {
+    throw new ConfigurationError(
+      "Read",
+      `Parser ${parser} is not valid a parser`
+    );
+  }
+  let schema2 = collection.schema;
+  if (!schema2["~standard"]) {
+    warnDeprecated("legacySchema");
+    schema2 = z.object(schema2(z));
+  }
+  return {
+    ...collection,
+    typeName,
+    parser,
+    schema: schema2
+  };
+}
+function defineConfig(config) {
+  return config;
+}
+
+// src/serializer.ts
+import serializeJs from "serialize-javascript";
+import z2 from "zod";
+
+// src/import.ts
+var importSymbol = Symbol("import");
+function isImport(value) {
+  return value && value[importSymbol];
+}
+function createDefaultImport(path10) {
+  return {
+    [importSymbol]: true,
+    path: path10
+  };
+}
+function createNamedImport(name, path10) {
+  return {
+    [importSymbol]: true,
+    path: path10,
+    name
+  };
+}
+
+// src/serializer.ts
+var literalSchema = z2.union([
+  // json
+  z2.string(),
+  z2.number(),
+  z2.boolean(),
+  z2.null(),
+  // serializable-javascript
+  z2.undefined(),
+  z2.date(),
+  z2.map(z2.unknown(), z2.unknown()),
+  z2.set(z2.unknown()),
+  z2.bigint()
+]);
+var schema = z2.lazy(
+  () => z2.union([literalSchema, z2.array(schema), z2.record(schema)])
+);
+var extension = "js";
+var serializableSchema = z2.record(schema);
+function createImport(imp, variableName) {
+  const variableDeclaration = imp.name ? `{ ${imp.name} as ${variableName} }` : variableName;
+  return `import ${variableDeclaration} from "${imp.path}";
+`;
+}
+function serialize(value) {
+  let serializedValue = "";
+  let counter = 0;
+  function handleImports(item) {
+    if (item instanceof Object) {
+      Object.entries(item).forEach(([key, value2]) => {
+        if (isImport(value2)) {
+          counter++;
+          const variableName = `__v_${counter}`;
+          serializedValue += createImport(value2, variableName);
+          item[key] = variableName;
+        } else if (value2 instanceof Object) {
+          handleImports(value2);
+        }
+      });
+    }
+  }
+  value.forEach(handleImports);
+  serializedValue += "\n";
+  const js = serializeJs(value, {
+    space: 2,
+    unsafe: true,
+    ignoreFunction: true
+  }).replace(/"__v_(\d+)"/g, (_, index) => {
+    return `__v_${index}`;
+  });
+  serializedValue += "export default " + js;
+  return serializedValue;
+}
+
+// src/transformer.ts
+var TransformError = class extends Error {
+  type;
+  constructor(type, message) {
+    super(message);
+    this.type = type;
+  }
+};
+function isSkippedSignal(signal) {
+  return signal[skippedSymbol] === true;
+}
+function createPath(path10, ext) {
+  let p = path10.slice(0, -ext.length);
+  if (p.endsWith("/index")) {
+    p = p.slice(0, -6);
+  }
+  return p;
+}
+function createTransformer(emitter, cacheManager) {
+  async function parseFile(collection, file) {
+    const { data, path: path10 } = file;
+    let parsedData = await collection.schema["~standard"].validate(data);
+    if (parsedData.issues) {
+      emitter.emit("transformer:validation-error", {
+        collection,
+        file,
+        // TODO: check for better issue formatting
+        error: new TransformError(
+          "Validation",
+          parsedData.issues.map((issue) => issue.message).join(", ")
+        )
+      });
+      return null;
+    }
+    let values = parsedData.value;
+    const parser = getParser(collection.parser);
+    if (parser.hasContent) {
+      if (typeof data.content !== "string") {
+        emitter.emit("transformer:validation-error", {
+          collection,
+          file,
+          error: new TransformError(
+            "Validation",
+            `The content property is not a string`
+          )
+        });
+        return null;
+      }
+      values = {
+        // @ts-expect-error we can only spread on objects
+        ...values,
+        content: data.content
+      };
+    }
+    const ext = extname(path10);
+    let extension2 = ext;
+    if (extension2.startsWith(".")) {
+      extension2 = extension2.slice(1);
+    }
+    const document = {
+      // @ts-expect-error we can only spread on objects
+      ...values,
+      _meta: {
+        filePath: path10,
+        fileName: basename(path10),
+        directory: dirname2(path10),
+        extension: extension2,
+        path: createPath(path10, ext)
+      }
+    };
+    return {
+      document
+    };
+  }
+  async function parseCollection(collection) {
+    const promises = collection.files.map(
+      (file) => parseFile(collection, file)
+    );
+    return {
+      ...collection,
+      documents: (await Promise.all(promises)).filter(isDefined)
+    };
+  }
+  function createContext(collections, collection, cache) {
+    return {
+      documents: (collection2) => {
+        const resolved = collections.find((c) => c.name === collection2.name);
+        if (!resolved) {
+          throw new TransformError(
+            "Configuration",
+            `Collection ${collection2.name} not found, do you have registered it in your configuration?`
+          );
+        }
+        return resolved.documents.map((doc) => doc.document);
+      },
+      collection: {
+        name: collection.name,
+        directory: collection.directory,
+        documents: async () => {
+          return collection.documents.map((doc) => doc.document);
+        }
+      },
+      cache: cache.cacheFn,
+      skip: (reason) => ({
+        [skippedSymbol]: true,
+        reason
+      })
+    };
+  }
+  async function transformDocument(collections, collection, transform, doc) {
+    const cache = cacheManager.cache(collection.name, doc.document._meta.path);
+    const context2 = createContext(collections, collection, cache);
+    try {
+      const document = await transform(doc.document, context2);
+      await cache.tidyUp();
+      if (isSkippedSignal(document)) {
+        emitter.emit("transformer:document-skipped", {
+          collection,
+          filePath: join3(collection.directory, doc.document._meta.filePath),
+          reason: document.reason
+        });
+      } else {
+        return {
+          ...doc,
+          document
+        };
+      }
+    } catch (error) {
+      if (error instanceof TransformError) {
+        emitter.emit("transformer:error", {
+          collection,
+          error
+        });
+      } else {
+        emitter.emit("transformer:error", {
+          collection,
+          error: new TransformError("Transform", String(error))
+        });
+      }
+    }
+  }
+  async function transformCollection(collections, collection) {
+    const transform = collection.transform;
+    if (transform) {
+      const limit = pLimit(os.cpus().length);
+      const docs = collection.documents.map(
+        (doc) => limit(() => transformDocument(collections, collection, transform, doc))
+      );
+      const transformed = await Promise.all(docs);
+      await cacheManager.flush();
+      return transformed.filter(isDefined);
+    }
+    return collection.documents;
+  }
+  async function validateDocuments(collection, documents) {
+    const docs = [];
+    for (const doc of documents) {
+      let parsedData = await serializableSchema.safeParseAsync(doc.document);
+      if (parsedData.success) {
+        docs.push(doc);
+      } else {
+        emitter.emit("transformer:result-error", {
+          collection,
+          document: doc.document,
+          error: new TransformError("Result", parsedData.error.message)
+        });
+      }
+    }
+    return docs;
+  }
+  return async (untransformedCollections) => {
+    const promises = untransformedCollections.map(
+      (collection) => parseCollection(collection)
+    );
+    const collections = await Promise.all(promises);
+    for (const collection of collections) {
+      const documents = await transformCollection(collections, collection);
+      collection.documents = await validateDocuments(collection, documents);
+    }
+    return collections;
+  };
+}
+
+// src/writer.ts
+import fs3 from "node:fs/promises";
+import path7 from "node:path";
+import pluralize2 from "pluralize";
+function createArrayConstName(name) {
+  let suffix = name.charAt(0).toUpperCase() + name.slice(1);
+  return "all" + pluralize2(suffix);
+}
+async function createDataFile(directory, collection) {
+  const dataPath = path7.join(
+    directory,
+    `${createArrayConstName(collection.name)}.${extension}`
+  );
+  await fs3.writeFile(
+    dataPath,
+    serialize(collection.documents.map((doc) => doc.document))
+  );
+}
+function createDataFiles(directory, collections) {
+  return Promise.all(
+    collections.map((collection) => createDataFile(directory, collection))
+  );
+}
+async function createJavaScriptFile(directory, configuration) {
+  const collections = configuration.collections.map(
+    ({ name }) => createArrayConstName(name)
+  );
+  let content = `// generated by content-collections at ${/* @__PURE__ */ new Date()}
+
+`;
+  for (const name of collections) {
+    content += `import ${name} from "./${name}.${extension}";
+`;
+  }
+  content += "\n";
+  content += "export { " + collections.join(", ") + " };\n";
+  await fs3.writeFile(path7.join(directory, "index.js"), content, "utf-8");
+}
+function createImportPath(directory, target) {
+  let importPath = path7.posix.join(
+    ...path7.relative(directory, target).split(path7.sep)
+  );
+  if (!importPath.startsWith(".")) {
+    importPath = "./" + importPath;
+  }
+  return importPath;
+}
+async function createTypeDefinitionFile(directory, configuration) {
+  if (!configuration.generateTypes) {
+    return;
+  }
+  const importPath = createImportPath(directory, configuration.path);
+  let content = `import configuration from "${importPath}";
+import { GetTypeByName } from "@content-collections/core";
+`;
+  const collections = configuration.collections;
+  for (const collection of collections) {
+    content += `
+`;
+    content += `export type ${collection.typeName} = GetTypeByName<typeof configuration, "${collection.name}">;
+`;
+    content += `export declare const ${createArrayConstName(
+      collection.name
+    )}: Array<${collection.typeName}>;
+`;
+  }
+  content += "\n";
+  content += "export {};\n";
+  await fs3.writeFile(path7.join(directory, "index.d.ts"), content, "utf-8");
+}
+async function createWriter(directory) {
+  await fs3.mkdir(directory, { recursive: true });
+  return {
+    createJavaScriptFile: (configuration) => createJavaScriptFile(directory, configuration),
+    createTypeDefinitionFile: (configuration) => createTypeDefinitionFile(directory, configuration),
+    createDataFiles: (collections) => createDataFiles(directory, collections)
+  };
+}
+
+// src/build.ts
+async function createBuildContext({
+  emitter,
+  outputDirectory,
+  baseDirectory,
+  configuration
+}) {
+  const collector = createCollector(emitter, baseDirectory);
+  const [writer, resolved, cacheManager] = await Promise.all([
+    createWriter(outputDirectory),
+    collector.collect(configuration.collections),
+    createCacheManager(baseDirectory, configuration.checksum)
+  ]);
+  const synchronizer = createSynchronizer(
+    collector.collectFile,
+    resolved,
+    baseDirectory
+  );
+  const transform = createTransformer(emitter, cacheManager);
+  return {
+    resolved,
+    writer,
+    synchronizer,
+    transform,
+    emitter,
+    cacheManager,
+    configuration
+  };
+}
+async function build3({
+  emitter,
+  transform,
+  resolved,
+  writer,
+  configuration
+}) {
+  const startedAt = Date.now();
+  emitter.emit("builder:start", {
+    startedAt
+  });
+  const collections = await transform(resolved);
+  await Promise.all([
+    writer.createDataFiles(collections),
+    writer.createTypeDefinitionFile(configuration),
+    writer.createJavaScriptFile(configuration)
+  ]);
+  const pendingOnSuccess = collections.filter((collection) => Boolean(collection.onSuccess)).map(
+    (collection) => collection.onSuccess?.(collection.documents.map((doc) => doc.document))
+  );
+  await Promise.all(pendingOnSuccess.filter(isDefined));
+  const stats = collections.reduce(
+    (acc, collection) => {
+      acc.collections++;
+      acc.documents += collection.documents.length;
+      return acc;
+    },
+    {
+      collections: 0,
+      documents: 0
+    }
+  );
+  emitter.emit("builder:end", {
+    startedAt,
+    endedAt: Date.now(),
+    stats
+  });
+}
+
+// src/events.ts
+import { EventEmitter } from "node:events";
+function isEventWithError(event) {
+  return typeof event === "object" && event !== null && "error" in event;
+}
+function createEmitter() {
+  const emitter = new EventEmitter();
+  function on(key, listener) {
+    emitter.on(key, listener);
+  }
+  function emit(key, event) {
+    emitter.emit(key, event);
+    if (isEventWithError(event)) {
+      emitter.emit("_error", {
+        ...event,
+        _event: key
+      });
+    }
+    emitter.emit("_all", {
+      ...event,
+      _event: key
+    });
+  }
+  return {
+    on,
+    emit
+  };
+}
+
+// src/watcher.ts
+import chokidar from "chokidar";
+import path8, { dirname as dirname3, resolve } from "node:path";
+async function createWatcher(emitter, baseDirectory, configuration, sync) {
+  const paths = removeChildPaths([
+    ...configuration.collections.map((collection) => path8.join(baseDirectory, collection.directory)).map((p) => resolve(p)),
+    ...configuration.inputPaths.map((p) => dirname3(p))
+  ]);
+  const watcher = chokidar.watch(paths, {
+    ignored: [
+      /(^|[\/\\])\../,
+      // ignore dotfiles
+      /(^|[\/\\])node_modules([\/\\]|$)/
+      // ignore node_modules
+    ],
+    persistent: true,
+    ignoreInitial: true
+    // ignore initial add events
+  });
+  const handleEvent = async (modification, filePath) => {
+    try {
+      await sync(modification, filePath);
+    } catch (error) {
+      emitter.emit("watcher:subscribe-error", {
+        paths,
+        error: toError(error)
+      });
+    }
+  };
+  watcher.on("add", (filePath) => handleEvent("create", filePath));
+  watcher.on("change", (filePath) => handleEvent("update", filePath));
+  watcher.on("unlink", (filePath) => handleEvent("delete", filePath));
+  watcher.on("error", (error) => {
+    emitter.emit("watcher:subscribe-error", {
+      paths,
+      error: toError(error)
+    });
+  });
+  await new Promise((resolve2, reject) => {
+    watcher.on("ready", () => {
+      emitter.emit("watcher:subscribed", {
+        paths
+      });
+      resolve2();
+    });
+    watcher.on("error", reject);
+  });
+  return {
+    unsubscribe: async () => {
+      await watcher.close();
+      emitter.emit("watcher:unsubscribed", {
+        paths
+      });
+    }
+  };
+}
+
+// src/builder.ts
+function resolveOutputDir(baseDirectory, options) {
+  if (options.outputDir) {
+    return options.outputDir;
+  }
+  return path9.join(baseDirectory, ".content-collections", "generated");
+}
+var ConfigurationReloadError = class extends Error {
+  constructor(message) {
+    super(message);
+  }
+};
+async function createBuilder(configurationPath, options = {
+  configName: defaultConfigName
+}, emitter = createEmitter()) {
+  const readConfiguration = createConfigurationReader();
+  const baseDirectory = path9.dirname(configurationPath);
+  const configuration = await readConfiguration(configurationPath, options);
+  return createInternalBuilder(
+    configuration,
+    baseDirectory,
+    options,
+    emitter
+  );
+}
+async function createInternalBuilder(initialConfiguration, baseDirectory, options, emitter) {
+  const readConfiguration = createConfigurationReader();
+  const configurationPath = initialConfiguration.path;
+  const outputDirectory = resolveOutputDir(baseDirectory, options);
+  emitter.emit("builder:created", {
+    createdAt: Date.now(),
+    configurationPath,
+    outputDirectory
+  });
+  let configuration = initialConfiguration;
+  let watcher = null;
+  let context2 = await createBuildContext({
+    emitter,
+    baseDirectory,
+    outputDirectory,
+    configuration
+  });
+  async function sync(modification, filePath) {
+    if (configuration.inputPaths.includes(filePath)) {
+      if (await onConfigurationChange()) {
+        emitter.emit("watcher:config-changed", {
+          filePath,
+          modification
+        });
+        await build3(context2);
+        return true;
+      }
+    } else {
+      if (await onFileChange(modification, filePath)) {
+        emitter.emit("watcher:file-changed", {
+          filePath,
+          modification
+        });
+        await build3(context2);
+        return true;
+      }
+    }
+    return false;
+  }
+  async function onConfigurationChange() {
+    try {
+      configuration = await readConfiguration(configurationPath, options);
+    } catch (error) {
+      emitter.emit("watcher:config-reload-error", {
+        error: new ConfigurationReloadError(
+          `Failed to reload configuration: ${error}`
+        ),
+        configurationPath
+      });
+      return false;
+    }
+    if (watcher) {
+      await watcher.unsubscribe();
+    }
+    context2 = await createBuildContext({
+      emitter,
+      baseDirectory,
+      outputDirectory,
+      configuration
+    });
+    if (watcher) {
+      watcher = await createWatcher(
+        emitter,
+        baseDirectory,
+        configuration,
+        sync
+      );
+    }
+    return true;
+  }
+  async function onFileChange(modification, filePath) {
+    const { synchronizer } = context2;
+    if (modification === "delete") {
+      return synchronizer.deleted(filePath);
+    } else {
+      return synchronizer.changed(filePath);
+    }
+  }
+  async function watch() {
+    watcher = await createWatcher(emitter, baseDirectory, configuration, sync);
+    return {
+      unsubscribe: async () => {
+        if (watcher) {
+          await watcher.unsubscribe();
+        }
+      }
+    };
+  }
+  return {
+    build: () => build3(context2),
+    sync,
+    watch,
+    on: emitter.on
+  };
+}
+export {
+  CollectError,
+  ConfigurationError,
+  ConfigurationReloadError,
+  TransformError,
+  createBuilder,
+  createDefaultImport,
+  createInternalBuilder,
+  createNamedImport,
+  defineCollection,
+  defineConfig,
+  defineParser,
+  skippedSymbol,
+  suppressDeprecatedWarnings
+};

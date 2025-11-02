@@ -1,0 +1,38 @@
+# Dependencies
+node_modules
+pnpm-lock.yaml
+
+# Build outputs
+dist
+.content-collections
+
+# Development files
+.vscode
+.idea
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Testing
+coverage
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Misc
+*.md
+!README.md
+.prettierrc
+.prettierignore
+.eslintrc*

@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  # Development service with hot-reload
+  dev:
+    build:
+      context: .
+      target: base
+    container_name: mdx-dev
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/.content-collections
+    command: sh -c "pnpm install && pnpm run dev"
+    environment:
+      - NODE_ENV=development
+      - VITE_PORT=3000
+    stdin_open: true
+    tty: true
+
+  # Production service
+  prod:
+    build:
+      context: .
+      target: runner
+    container_name: mdx-prod
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - HOSTNAME=0.0.0.0
+    restart: unless-stopped
+
+  # Build service (for building separately)
+  build:
+    build:
+      context: .
+      target: builder
+    container_name: mdx-build
+    volumes:
+      - ./dist:/app/dist
+    environment:
+      - NODE_ENV=production

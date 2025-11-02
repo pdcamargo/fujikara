@@ -1,0 +1,343 @@
+import { StandardSchemaV1 } from '@standard-schema/spec';
+import z__default, { ZodRawShape, z as z$1, ZodObject } from 'zod';
+export * from 'zod';
+
+type Options$2 = {
+    key: string;
+};
+type CacheFn = <TInput, TOutput>(input: TInput, compute: (input: TInput) => Promise<TOutput> | TOutput, options?: Options$2) => Promise<TOutput>;
+
+declare const importSymbol: unique symbol;
+type Import<T> = {
+    [importSymbol]: true;
+    path: string;
+    name?: string;
+};
+type GetTypeOfImport<T> = T extends Import<infer U> ? U : never;
+declare function createDefaultImport<T>(path: string): Import<T>;
+declare function createNamedImport<T>(name: string, path: string): Import<T>;
+
+type ParseFn = (content: string) => Record<string, unknown> | Promise<Record<string, unknown>>;
+type Parser = {
+    hasContent: boolean;
+    parse: ParseFn;
+};
+type PredefinedParsers = typeof parsers;
+type PredefinedParser = keyof typeof parsers;
+type ConfiguredParser = PredefinedParser | Parser;
+declare function parseYaml(content: string): any;
+declare function frontmatterParser(fileContent: string): {
+    content: string;
+};
+declare function frontmatterOnlyParser(fileContent: string): {
+    [key: string]: any;
+};
+declare const parsers: {
+    frontmatter: {
+        hasContent: true;
+        parse: typeof frontmatterParser;
+    };
+    "frontmatter-only": {
+        hasContent: false;
+        parse: typeof frontmatterOnlyParser;
+    };
+    json: {
+        hasContent: false;
+        parse: (text: string, reviver?: (this: any, key: string, value: any) => any) => any;
+    };
+    yaml: {
+        hasContent: false;
+        parse: typeof parseYaml;
+    };
+};
+type DefineParserResult<TArgument extends Parser | ParseFn> = TArgument extends Function ? {
+    hasContent: false;
+    parse: ParseFn;
+} : TArgument extends infer Parser ? Parser : never;
+declare function defineParser<TArgument extends Parser | ParseFn>(parser: TArgument): DefineParserResult<TArgument>;
+
+declare const literalSchema: z__default.ZodUnion<[z__default.ZodString, z__default.ZodNumber, z__default.ZodBoolean, z__default.ZodNull, z__default.ZodUndefined, z__default.ZodDate, z__default.ZodMap<z__default.ZodUnknown, z__default.ZodUnknown>, z__default.ZodSet<z__default.ZodUnknown>, z__default.ZodBigInt]>;
+type Literal = z__default.infer<typeof literalSchema>;
+type SchemaType = Literal | {
+    [key: string]: SchemaType;
+} | ReadonlyArray<SchemaType>;
+type NotSerializableError = `The return type of the transform function must be an object serializable object.
+See https://www.content-collections.dev/docs/serialization for more information.
+
+The following type is not valid:`;
+declare const serializableSchema: z__default.ZodRecord<z__default.ZodString, z__default.ZodType<SchemaType, z__default.ZodTypeDef, SchemaType>>;
+type Serializable = z__default.infer<typeof serializableSchema>;
+
+type Meta = {
+    filePath: string;
+    fileName: string;
+    directory: string;
+    path: string;
+    extension: string;
+};
+type WithContent = {
+    content: string;
+};
+type AddContent<TOutput> = TOutput extends {
+    content: any;
+} ? TOutput : TOutput & WithContent;
+type GetParser<TParser extends ConfiguredParser> = TParser extends PredefinedParser ? PredefinedParsers[TParser] : TParser;
+type HasContent<TParser extends ConfiguredParser> = GetParser<TParser>["hasContent"];
+type LegacySchema<TResult extends ZodRawShape = ZodRawShape> = (z: Z) => TResult;
+type TSchemaProp = StandardSchemaV1 | LegacySchema;
+type GetLegacySchemaShape<LegacySchema> = LegacySchema extends (z: Z) => infer TObjectShape ? TObjectShape : never;
+type GetOutputShape<TShape extends TSchemaProp> = TShape extends StandardSchemaV1 ? StandardSchemaV1.InferOutput<TShape> : TShape extends ZodObject<any> ? z$1.infer<TShape> : TShape extends LegacySchema ? z$1.infer<ZodObject<GetLegacySchemaShape<TShape>>> : never;
+type GetOutput<TParser extends ConfiguredParser, TShape extends TSchemaProp, TOutput = GetOutputShape<TShape>> = HasContent<TParser> extends true ? AddContent<TOutput> : TOutput;
+type Schema<TParser extends ConfiguredParser, TShape extends TSchemaProp> = GetOutput<TParser, TShape> & {
+    _meta: Meta;
+};
+type Prettify<T> = {
+    [K in keyof T]: T[K];
+} & {};
+type GetSchema<TCollection extends AnyCollection> = TCollection extends Collection<any, any, any, infer TSchema, any, any> ? Prettify<TSchema> : never;
+declare const skippedSymbol: unique symbol;
+type SkippedSignal = {
+    [skippedSymbol]: true;
+    reason?: string;
+};
+type Context<TSchema = unknown> = {
+    documents<TCollection extends AnyCollection>(collection: TCollection): Array<GetSchema<TCollection>>;
+    cache: CacheFn;
+    collection: {
+        name: string;
+        directory: string;
+        documents: () => Promise<Array<TSchema>>;
+    };
+    skip: (reason?: string) => SkippedSignal;
+};
+type Z = typeof z$1;
+type CollectionRequest<TName extends string, TShape extends TSchemaProp, TParser, TSchema, TTransformResult, TDocument> = {
+    name: TName;
+    parser?: TParser;
+    typeName?: string;
+    schema: TShape;
+    transform?: (data: TSchema, context: Context<TSchema>) => TTransformResult;
+    directory: string;
+    include: string | string[];
+    exclude?: string | string[];
+    onSuccess?: (documents: Array<TDocument>) => void | Promise<void>;
+};
+type Collection<TName extends string, TShape extends TSchemaProp, TParser extends ConfiguredParser, TSchema, TTransformResult, TDocument> = Omit<CollectionRequest<TName, TShape, TParser, TSchema, TTransformResult, TDocument>, "schema"> & {
+    typeName: string;
+    schema: StandardSchemaV1;
+    parser: TParser;
+};
+type AnyCollection = Collection<any, TSchemaProp, ConfiguredParser, any, any, any>;
+declare const InvalidReturnTypeSymbol: unique symbol;
+type InvalidReturnType<TMessage extends string, TObject> = {
+    [InvalidReturnTypeSymbol]: TMessage;
+    object: TObject;
+};
+type ResolveImports<TTransformResult> = TTransformResult extends Import<any> ? GetTypeOfImport<TTransformResult> : TTransformResult extends Array<infer U> ? Array<ResolveImports<U>> : TTransformResult extends (...args: any[]) => any ? TTransformResult : TTransformResult extends object ? {
+    [K in keyof TTransformResult]: ResolveImports<TTransformResult[K]>;
+} : TTransformResult;
+declare function defineCollection<TName extends string, TShape extends TSchemaProp, TParser extends ConfiguredParser = "frontmatter", TSchema = Schema<TParser, TShape>, TTransformResult = never, TDocument = [TTransformResult] extends [never] ? Schema<TParser, TShape> : Exclude<Awaited<TTransformResult>, SkippedSignal>, TResult = TDocument extends Serializable ? Collection<TName, TShape, TParser, TSchema, TTransformResult, ResolveImports<TDocument>> : InvalidReturnType<NotSerializableError, TDocument>>(collection: CollectionRequest<TName, TShape, TParser, TSchema, TTransformResult, TDocument>): TResult;
+type Cache = "memory" | "file" | "none";
+type Configuration<TCollections extends Array<AnyCollection>> = {
+    collections: TCollections;
+    cache?: Cache;
+};
+type AnyConfiguration = Configuration<Array<AnyCollection>>;
+declare function defineConfig<TConfig extends AnyConfiguration>(config: TConfig): TConfig;
+
+type Modification = "create" | "update" | "delete";
+type Document = {
+    _meta: Meta;
+};
+type CollectionFile = {
+    data: {
+        content?: string;
+        [key: string]: unknown;
+    };
+    path: string;
+};
+type CollectionByName<TConfiguration extends AnyConfiguration> = {
+    [TCollection in TConfiguration["collections"][number] as TCollection["name"]]: TCollection;
+};
+type GetDocument<TCollection extends AnyCollection> = TCollection extends Collection<any, any, any, any, any, infer TDocument> ? TDocument : never;
+type GetTypeByName<TConfiguration extends AnyConfiguration, TName extends keyof CollectionByName<TConfiguration>, TCollection = CollectionByName<TConfiguration>[TName]> = TCollection extends AnyCollection ? GetDocument<TCollection> : never;
+
+type CollectorEvents = {
+    "collector:read-error": {
+        filePath: string;
+        error: CollectError;
+    };
+    "collector:parse-error": {
+        filePath: string;
+        error: CollectError;
+    };
+};
+type ErrorType$2 = "Parse" | "Read";
+declare class CollectError extends Error {
+    type: ErrorType$2;
+    constructor(type: ErrorType$2, message: string);
+}
+
+type TransformerEvents = {
+    "transformer:validation-error": {
+        collection: AnyCollection;
+        file: CollectionFile;
+        error: TransformError;
+    };
+    "transformer:result-error": {
+        collection: AnyCollection;
+        document: any;
+        error: TransformError;
+    };
+    "transformer:error": {
+        collection: AnyCollection;
+        error: TransformError;
+    };
+    "transformer:document-skipped": {
+        collection: AnyCollection;
+        filePath: string;
+        reason?: string;
+    };
+};
+type ErrorType$1 = "Validation" | "Configuration" | "Transform" | "Result";
+declare class TransformError extends Error {
+    type: ErrorType$1;
+    constructor(type: ErrorType$1, message: string);
+}
+
+type WatcherEvents = {
+    "watcher:subscribe-error": {
+        paths: Array<string>;
+        error: Error;
+    };
+    "watcher:subscribed": {
+        paths: Array<string>;
+    };
+    "watcher:unsubscribed": {
+        paths: Array<string>;
+    };
+};
+type SyncFn = (modification: Modification, path: string) => Promise<unknown>;
+type WatchableCollection = {
+    directory: string;
+};
+type WatcherConfiguration = {
+    inputPaths: Array<string>;
+    collections: Array<WatchableCollection>;
+};
+declare function createWatcher(emitter: Emitter, baseDirectory: string, configuration: WatcherConfiguration, sync: SyncFn): Promise<{
+    unsubscribe: () => Promise<void>;
+}>;
+type Watcher = Awaited<ReturnType<typeof createWatcher>>;
+
+type EventMap = Record<string, object>;
+type EventWithError = {
+    error: Error;
+};
+type SystemEvent = {
+    _event: string;
+};
+type ErrorEvent = EventWithError & SystemEvent;
+type Events = BuilderEvents & CollectorEvents & TransformerEvents & WatcherEvents;
+type SystemEvents = {
+    _error: ErrorEvent;
+    _all: SystemEvent;
+};
+type Keys<TEvents extends EventMap> = keyof TEvents & string;
+type Listener<TEvent> = (event: TEvent) => void;
+declare function createEmitter<TEvents extends EventMap>(): {
+    on: {
+        <TKey extends Keys<TEvents>>(key: TKey, listener: Listener<TEvents[TKey]>): void;
+        <TKey extends Keys<SystemEvents>>(key: TKey, listener: Listener<SystemEvents[TKey]>): void;
+    };
+    emit: <TKey extends Keys<TEvents>>(key: TKey, event: TEvents[TKey]) => void;
+};
+type Emitter = ReturnType<typeof createEmitter<Events>>;
+
+type ErrorType = "Read" | "Compile";
+declare class ConfigurationError extends Error {
+    type: ErrorType;
+    constructor(type: ErrorType, message: string);
+}
+type InternalConfiguration = {
+    collections: Array<AnyCollection>;
+    path: string;
+    inputPaths: Array<string>;
+    checksum: string;
+    generateTypes?: boolean;
+};
+type Options$1 = {
+    configName: string;
+    cacheDir?: string;
+};
+
+type BuildEvents = {
+    "builder:start": {
+        startedAt: number;
+    };
+    "builder:end": {
+        startedAt: number;
+        endedAt: number;
+        stats: {
+            collections: number;
+            documents: number;
+        };
+    };
+};
+
+type BuilderEvents = BuildEvents & {
+    "builder:created": {
+        createdAt: number;
+        configurationPath: string;
+        outputDirectory: string;
+    };
+    "watcher:file-changed": {
+        filePath: string;
+        modification: Modification;
+    };
+    "watcher:config-changed": {
+        filePath: string;
+        modification: Modification;
+    };
+    "watcher:config-reload-error": {
+        error: Error;
+        configurationPath: string;
+    };
+};
+type Options = Options$1 & {
+    outputDir?: string;
+};
+declare class ConfigurationReloadError extends Error {
+    constructor(message: string);
+}
+declare function createBuilder(configurationPath: string, options?: Options, emitter?: Emitter): Promise<{
+    build: () => Promise<void>;
+    sync: (modification: Modification, filePath: string) => Promise<boolean>;
+    watch: () => Promise<{
+        unsubscribe: () => Promise<void>;
+    }>;
+    on: {
+        <TKey extends "builder:start" | "builder:end" | "builder:created" | "watcher:file-changed" | "watcher:config-changed" | "watcher:config-reload-error" | "collector:read-error" | "collector:parse-error" | "transformer:validation-error" | "transformer:result-error" | "transformer:error" | "transformer:document-skipped" | "watcher:subscribe-error" | "watcher:subscribed" | "watcher:unsubscribed">(key: TKey, listener: (event: Events[TKey]) => void): void;
+        <TKey extends "_error" | "_all">(key: TKey, listener: (event: SystemEvents[TKey]) => void): void;
+    };
+}>;
+declare function createInternalBuilder(initialConfiguration: InternalConfiguration, baseDirectory: string, options: Options, emitter: Emitter): Promise<{
+    build: () => Promise<void>;
+    sync: (modification: Modification, filePath: string) => Promise<boolean>;
+    watch: () => Promise<{
+        unsubscribe: () => Promise<void>;
+    }>;
+    on: {
+        <TKey extends "builder:start" | "builder:end" | "builder:created" | "watcher:file-changed" | "watcher:config-changed" | "watcher:config-reload-error" | "collector:read-error" | "collector:parse-error" | "transformer:validation-error" | "transformer:result-error" | "transformer:error" | "transformer:document-skipped" | "watcher:subscribe-error" | "watcher:subscribed" | "watcher:unsubscribed">(key: TKey, listener: (event: Events[TKey]) => void): void;
+        <TKey extends "_error" | "_all">(key: TKey, listener: (event: SystemEvents[TKey]) => void): void;
+    };
+}>;
+type Builder = Awaited<ReturnType<typeof createBuilder>>;
+
+declare const deprecations: {
+    legacySchema: string;
+};
+type Deprecation = keyof typeof deprecations;
+declare function suppressDeprecatedWarnings(...suppresses: Array<Deprecation | "all">): void;
+
+export { type AnyCollection, type AnyConfiguration, type Builder, type BuilderEvents, CollectError, type Collection, type CollectionRequest, type Configuration, ConfigurationError, ConfigurationReloadError, type Context, type Document, type GetTypeByName, type Meta, type Modification, type Schema, type SkippedSignal, TransformError, type Watcher, createBuilder, createDefaultImport, createInternalBuilder, createNamedImport, defineCollection, defineConfig, defineParser, skippedSymbol, suppressDeprecatedWarnings };

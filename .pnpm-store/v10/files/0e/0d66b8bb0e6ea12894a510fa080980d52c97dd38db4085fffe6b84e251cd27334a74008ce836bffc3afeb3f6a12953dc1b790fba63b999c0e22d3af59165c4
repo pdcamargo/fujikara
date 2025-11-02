@@ -1,0 +1,9 @@
+import { UserConfig, Plugin } from 'vite';
+
+type Options = {
+    configPath: string;
+    isEnabled?: (config: UserConfig) => boolean;
+};
+declare function contentCollectionsPlugin(options?: Partial<Options>): Plugin;
+
+export { type Options, contentCollectionsPlugin as default };

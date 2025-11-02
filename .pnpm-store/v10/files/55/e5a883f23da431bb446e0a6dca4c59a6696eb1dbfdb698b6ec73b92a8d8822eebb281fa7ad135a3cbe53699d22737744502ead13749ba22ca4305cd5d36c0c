@@ -1,0 +1,5 @@
+import { Builder } from '@content-collections/core';
+
+declare function configureLogging(builder: Builder): void;
+
+export { configureLogging };
