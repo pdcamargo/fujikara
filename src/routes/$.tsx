@@ -38,7 +38,7 @@ export const Route = createFileRoute('/$')({
         ...md._meta,
         path: md._meta.path
           .split(' ')
-          .map((p) => p.toLowerCase())
+          .map((p: string) => p.toLowerCase())
           .join('-'),
       },
     }))

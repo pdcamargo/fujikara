@@ -1,14 +1,26 @@
 import { Link, createFileRoute } from '@tanstack/react-router'
 import { allMdxes } from 'content-collections'
-import { BookOpen, ChevronDown, ChevronRight, File, FileText, Folder } from 'lucide-react'
+import {
+  BookOpen,
+  ChevronDown,
+  ChevronRight,
+  File,
+  FileText,
+  Folder,
+} from 'lucide-react'
 import { useState } from 'react'
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '@/components/ui/collapsible'
 
 // Category label mapping for display names
 const CATEGORY_LABELS: Record<string, string> = {
   vilas: 'Vilas',
   organizacoes: 'Organizações',
   personagens: 'Personagens',
+  localizacoes: 'Localizações',
 }
 
 // Helper to get display label for a category
@@ -24,7 +36,9 @@ type NestedCategory = {
 }
 
 // Build hierarchical category structure from flat document list
-const buildHierarchy = (documents: Array<DocWithSlug>): Record<string, NestedCategory> => {
+const buildHierarchy = (
+  documents: Array<DocWithSlug>,
+): Record<string, NestedCategory> => {
   const hierarchy: Record<string, NestedCategory> = {}
 
   for (const doc of documents) {
@@ -91,7 +105,7 @@ export const Route = createFileRoute('/')({
       ...doc,
       slug: doc._meta.path
         .split(' ')
-        .map((p) => p.toLowerCase())
+        .map((p: string) => p.toLowerCase())
         .join('-'),
     }))
 
@@ -124,7 +138,7 @@ function DocumentItem({ doc, level }: { doc: DocWithSlug; level: number }) {
 function CategoryTree({
   categoryName,
   category,
-  level = 0
+  level = 0,
 }: {
   categoryName: string
   category: NestedCategory
@@ -167,14 +181,16 @@ function CategoryTree({
         {/* Subcategories */}
         {hasSubcategories && (
           <div className="mt-1">
-            {sortCategories(Object.keys(category.subcategories)).map((subCategoryName) => (
-              <CategoryTree
-                key={subCategoryName}
-                categoryName={subCategoryName}
-                category={category.subcategories[subCategoryName]}
-                level={level + 1}
-              />
-            ))}
+            {sortCategories(Object.keys(category.subcategories)).map(
+              (subCategoryName) => (
+                <CategoryTree
+                  key={subCategoryName}
+                  categoryName={subCategoryName}
+                  category={category.subcategories[subCategoryName]}
+                  level={level + 1}
+                />
+              ),
+            )}
           </div>
         )}
       </CollapsibleContent>
@@ -191,9 +207,18 @@ function WikiIndex() {
 
   // Count total categories (including nested)
   const countCategories = (cat: NestedCategory): number => {
-    return 1 + Object.values(cat.subcategories).reduce((sum, subcat) => sum + countCategories(subcat), 0)
+    return (
+      1 +
+      Object.values(cat.subcategories).reduce(
+        (sum, subcat) => sum + countCategories(subcat),
+        0,
+      )
+    )
   }
-  const totalCategories = Object.values(hierarchy).reduce((sum, cat) => sum + countCategories(cat), 0)
+  const totalCategories = Object.values(hierarchy).reduce(
+    (sum, cat) => sum + countCategories(cat),
+    0,
+  )
 
   return (
     <div className="min-h-screen bg-background text-foreground">
