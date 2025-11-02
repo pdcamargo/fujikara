@@ -367,6 +367,168 @@ export function generateTableOfContents(content: string): string {
 }
 
 /**
+ * Document reference for autolink generation
+ */
+export interface DocumentReference {
+  title: string
+  _meta: {
+    path: string
+  }
+}
+
+/**
+ * Transforms content by automatically linking document titles to their URLs
+ *
+ * Scans the content for mentions of other document titles (case-insensitive,
+ * exact match) and replaces them with markdown links. Avoids self-linking
+ * and double-linking already linked text.
+ *
+ * @param content - The raw content to transform
+ * @param currentDocPath - The path of the current document to avoid self-linking
+ * @param allDocuments - Array of all documents with title and path
+ * @returns Content with automatic links inserted
+ *
+ * @example
+ * ```ts
+ * const content = `Visit Fujikara to meet Enryuu Keguri.`
+ * const currentPath = 'vilas/Fujikara'
+ * const docs = [
+ *   { title: 'Fujikara', _meta: { path: 'vilas/Fujikara' } },
+ *   { title: 'Enryuu Keguri', _meta: { path: 'vilas/Fujikara/personagens/Enryuu Keguri' } }
+ * ]
+ *
+ * const result = transformAutolinks(content, currentPath, docs)
+ * // Returns: `Visit Fujikara to meet [Enryuu Keguri](/vilas/fujikara/personagens/enryuu-keguri).`
+ * // Note: Fujikara is not linked (self-reference)
+ * ```
+ */
+export function transformAutolinks(
+  content: string,
+  currentDocPath: string,
+  allDocuments: Array<DocumentReference>,
+): string {
+  // Filter out current document to avoid self-linking
+  const otherDocuments = allDocuments.filter(
+    (doc) => doc._meta.path !== currentDocPath,
+  )
+
+  // Sort documents by title length (longest first) to match longer titles before shorter ones
+  // This prevents "New York City" from matching only "New York" if both exist
+  const sortedDocuments = [...otherDocuments].sort(
+    (a, b) => b.title.length - a.title.length,
+  )
+
+  let transformedContent = content
+
+  for (const doc of sortedDocuments) {
+    // Generate URL from path: convert spaces to lowercase and join with hyphens
+    const url = `/${doc._meta.path
+      .split(' ')
+      .map((p) => p.toLowerCase())
+      .join('-')}`
+
+    // Escape special regex characters in the title
+    const escapedTitle = doc.title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+
+    // Create a regex pattern that:
+    // 1. Matches the title case-insensitively
+    // 2. Uses word boundaries to ensure exact matches only
+    // 3. Uses negative lookbehind/lookahead to avoid matching:
+    //    - Already-linked text (not preceded by [ or ](, not followed by ] or )
+    //    - Image alt text (not preceded by ![)
+    const pattern = new RegExp(
+      `(?<!\\[)(?<!\\]\\()(?<!\\!\\[)\\b(${escapedTitle})\\b(?!\\])(?!\\)\\()`,
+      'gi',
+    )
+
+    // Replace all matches with markdown link syntax
+    transformedContent = transformedContent.replace(pattern, `[$1](${url})`)
+  }
+
+  return transformedContent
+}
+
+/**
+ * Related document structure
+ */
+export interface RelatedDocument {
+  title: string
+  path: string
+}
+
+/**
+ * Finds documents that are mentioned in the current document's content
+ *
+ * Searches the content for exact matches (case-insensitive) of other document titles
+ * and returns an array of related documents. Filters out the current document to
+ * avoid self-references and removes duplicates.
+ *
+ * @param content - The document content to search
+ * @param currentDocPath - The path of the current document to avoid self-linking
+ * @param allDocuments - Array of all documents with title and path
+ * @returns Array of unique related documents with title and formatted path
+ *
+ * @example
+ * ```ts
+ * const content = `Visit Fujikara to meet Enryuu Keguri and Enryuu Keguri again.`
+ * const currentPath = 'vilas/Fujikara'
+ * const docs = [
+ *   { title: 'Fujikara', _meta: { path: 'vilas/Fujikara' } },
+ *   { title: 'Enryuu Keguri', _meta: { path: 'vilas/Fujikara/personagens/Enryuu Keguri' } }
+ * ]
+ *
+ * const related = findRelatedDocuments(content, currentPath, docs)
+ * // Returns: [{ title: 'Enryuu Keguri', path: '/vilas/fujikara/personagens/enryuu-keguri' }]
+ * // Note: Fujikara filtered out (self-reference), Enryuu Keguri appears only once (deduplicated)
+ * ```
+ */
+export function findRelatedDocuments(
+  content: string,
+  currentDocPath: string,
+  allDocuments: Array<DocumentReference>,
+): Array<RelatedDocument> {
+  // Filter out current document to avoid self-linking
+  const otherDocuments = allDocuments.filter(
+    (doc) => doc._meta.path !== currentDocPath,
+  )
+
+  // Set to track unique document paths (avoid duplicates)
+  const relatedSet = new Set<string>()
+  const relatedDocuments: Array<RelatedDocument> = []
+
+  for (const doc of otherDocuments) {
+    // Skip if already added
+    if (relatedSet.has(doc._meta.path)) {
+      continue
+    }
+
+    // Escape special regex characters in the title
+    const escapedTitle = doc.title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+
+    // Create case-insensitive regex pattern with word boundaries for exact matches
+    const pattern = new RegExp(`\\b${escapedTitle}\\b`, 'gi')
+
+    // Check if the title appears in the content
+    if (pattern.test(content)) {
+      // Generate URL from path: convert spaces to lowercase and join with hyphens
+      const path = `/${doc._meta.path
+        .split(' ')
+        .map((p) => p.toLowerCase())
+        .join('-')}`
+
+      relatedDocuments.push({
+        title: doc.title,
+        path,
+      })
+
+      relatedSet.add(doc._meta.path)
+    }
+  }
+
+  return relatedDocuments
+}
+
+/**
  * Extracts structured section data from markdown content for navigation
  *
  * Similar to generateTableOfContents but returns a flat array of section

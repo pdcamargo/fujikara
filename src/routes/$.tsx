@@ -4,6 +4,7 @@ import { allMdxes } from 'content-collections'
 import { FloatingNavigation } from '@/components/floating-navigation'
 import { TableOfContents } from '@/components/table-of-contents'
 import { ReadingProgressBar } from '@/components/reading-progress-bar'
+import { RelatedDocuments } from '@/components/related-documents'
 
 const generateSlug = (text: string): string => {
   return text
@@ -150,6 +151,13 @@ function RouteComponent() {
           )}
         </div>
       </div>
+
+      {/* Related Documents Section */}
+      {mdx?.related && (
+        <div className="max-w-[1360px] w-full px-10 pb-10 mx-auto">
+          <RelatedDocuments relatedJson={mdx.related} />
+        </div>
+      )}
 
       {/* Floating navigation bar */}
       {mdx?.sections && <FloatingNavigation sectionsJson={mdx.sections} />}

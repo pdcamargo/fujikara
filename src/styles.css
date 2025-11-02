@@ -138,7 +138,8 @@ code {
 }
 
 .sidepanel {
-  @apply w-full text-xs;
+  @apply w-full text-xs bg-gray-100;
+  @apply dark:bg-gray-800;
   max-width: 400px;
   min-width: 400px;
 }
@@ -149,16 +150,19 @@ code {
 
 .sidepanel img[src='placeholder.jpg'] {
   @apply w-full max-h-[160px] object-cover min-h-[160px] bg-gray-100 text-gray-100 relative;
+  @apply dark:bg-gray-800 dark:text-gray-800;
 }
 
 .sidepanel img[src='placeholder.jpg']::before {
   @apply absolute inset-0 flex items-center justify-center font-bold uppercase text-xs text-center bg-gray-100 text-black/50;
+  @apply dark:bg-gray-800 dark:text-white/50;
   content: 'Imagem não disponível';
 }
 
 .sidepanel h2,
 .sidepanel h3 {
   @apply mt-0 text-lg font-bold text-center bg-purple-500 text-white;
+  @apply dark:bg-purple-700;
 }
 
 /* for h3 that has a P before, mt-2 */
@@ -192,12 +196,14 @@ code {
 
 .info-group-row {
   @apply grid bg-gray-100 border-b-2 border-black/10;
+  @apply dark:bg-gray-800 dark:border-white/10;
 
   grid-template-columns: var(--info-group-key-width, 15ch) 1fr;
 }
 
 .info-group-key {
   @apply font-bold border-r border-black/20 h-full block p-1;
+  @apply dark:border-white/20;
 }
 
 .info-group-value {

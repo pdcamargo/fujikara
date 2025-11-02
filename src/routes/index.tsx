@@ -1,118 +1,126 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { Link, createFileRoute } from '@tanstack/react-router'
+import { allMdxes } from 'content-collections'
+import { BookOpen, FileText } from 'lucide-react'
 import {
-  Route as RouteIcon,
-  Server,
-  Shield,
-  Sparkles,
-  Waves,
-  Zap,
-} from 'lucide-react'
+  Card,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
 
-export const Route = createFileRoute('/')({ component: App })
+export const Route = createFileRoute('/')({
+  component: WikiIndex,
+  beforeLoad() {
+    // Process and group all MDX documents
+    const documents = allMdxes.map((doc) => ({
+      ...doc,
+      slug: doc._meta.path
+        .split(' ')
+        .map((p) => p.toLowerCase())
+        .join('-'),
+    }))
 
-function App() {
-  const features = [
-    {
-      icon: <Zap className="w-12 h-12 text-cyan-400" />,
-      title: 'Powerful Server Functions',
-      description:
-        'Write server-side code that seamlessly integrates with your client components. Type-safe, secure, and simple.',
+    return { documents }
+  },
+})
+
+function WikiIndex() {
+  const { documents } = Route.useRouteContext()
+
+  // Group documents by category/directory
+  const groupedDocs = documents.reduce(
+    (acc, doc) => {
+      const pathParts = doc._meta.path.split('/')
+      const category = pathParts[0] || 'Uncategorized'
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+      if (!acc[category]) acc[category] = []
+      acc[category].push(doc)
+      return acc
     },
-    {
-      icon: <Server className="w-12 h-12 text-cyan-400" />,
-      title: 'Flexible Server Side Rendering',
-      description:
-        'Full-document SSR, streaming, and progressive enhancement out of the box. Control exactly what renders where.',
-    },
-    {
-      icon: <RouteIcon className="w-12 h-12 text-cyan-400" />,
-      title: 'API Routes',
-      description:
-        'Build type-safe API endpoints alongside your application. No separate backend needed.',
-    },
-    {
-      icon: <Shield className="w-12 h-12 text-cyan-400" />,
-      title: 'Strongly Typed Everything',
-      description:
-        'End-to-end type safety from server to client. Catch errors before they reach production.',
-    },
-    {
-      icon: <Waves className="w-12 h-12 text-cyan-400" />,
-      title: 'Full Streaming Support',
-      description:
-        'Stream data from server to client progressively. Perfect for AI applications and real-time updates.',
-    },
-    {
-      icon: <Sparkles className="w-12 h-12 text-cyan-400" />,
-      title: 'Next Generation Ready',
-      description:
-        'Built from the ground up for modern web applications. Deploy anywhere JavaScript runs.',
-    },
-  ]
+    {} as Record<string, typeof documents>,
+  )
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900">
-      <section className="relative py-20 px-6 text-center overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 via-blue-500/10 to-purple-500/10"></div>
-        <div className="relative max-w-5xl mx-auto">
-          <div className="flex items-center justify-center gap-6 mb-6">
-            <img
-              src="/tanstack-circle-logo.png"
-              alt="TanStack Logo"
-              className="w-24 h-24 md:w-32 md:h-32"
-            />
-            <h1 className="text-6xl md:text-7xl font-black text-white [letter-spacing:-0.08em]">
-              <span className="text-gray-300">TANSTACK</span>{' '}
-              <span className="bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
-                START
-              </span>
-            </h1>
+    <div className="min-h-screen bg-background text-foreground">
+      {/* Header */}
+      <section className="bg-card border-b border-border py-12 px-6">
+        <div className="container mx-auto max-w-7xl">
+          <div className="flex items-center gap-4 mb-4">
+            <BookOpen className="w-12 h-12 text-primary" />
+            <h1 className="text-5xl font-bold text-foreground">Fujikara</h1>
           </div>
-          <p className="text-2xl md:text-3xl text-gray-300 mb-4 font-light">
-            The framework for next generation AI applications
+          <p className="text-xl text-muted-foreground max-w-3xl">
+            Encontre todos os personagens, localizações e documentos de suporte
+            relacionados a Fujikara.
           </p>
-          <p className="text-lg text-gray-400 max-w-3xl mx-auto mb-8">
-            Full-stack framework powered by TanStack Router for React and Solid.
-            Build modern applications with server functions, streaming, and type
-            safety.
-          </p>
-          <div className="flex flex-col items-center gap-4">
-            <a
-              href="https://tanstack.com/start"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-8 py-3 bg-cyan-500 hover:bg-cyan-600 text-white font-semibold rounded-lg transition-colors shadow-lg shadow-cyan-500/50"
-            >
-              Documentation
-            </a>
-            <p className="text-gray-400 text-sm mt-2">
-              Begin your TanStack Start journey by editing{' '}
-              <code className="px-2 py-1 bg-slate-700 rounded text-cyan-400">
-                /src/routes/index.tsx
-              </code>
-            </p>
+          <div className="mt-6 flex items-center gap-4 text-sm text-muted-foreground">
+            <div className="flex items-center gap-2">
+              <FileText className="w-4 h-4" />
+              <span>{documents.length} documentos</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span>•</span>
+              <span>{Object.keys(groupedDocs).length} categorias</span>
+            </div>
           </div>
         </div>
       </section>
 
-      <section className="py-16 px-6 max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {features.map((feature, index) => (
-            <div
-              key={index}
-              className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl p-6 hover:border-cyan-500/50 transition-all duration-300 hover:shadow-lg hover:shadow-cyan-500/10"
-            >
-              <div className="mb-4">{feature.icon}</div>
-              <h3 className="text-xl font-semibold text-white mb-3">
-                {feature.title}
-              </h3>
-              <p className="text-gray-400 leading-relaxed">
-                {feature.description}
-              </p>
+      {/* Content sections */}
+      <div className="container mx-auto max-w-7xl px-6 py-12">
+        {Object.entries(groupedDocs).map(([category, docs]) => (
+          <section key={category} className="mb-16 last:mb-0">
+            <h2 className="text-3xl font-semibold text-foreground mb-6 capitalize border-b border-border pb-3">
+              {category}
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {docs.map((doc) => (
+                <Link
+                  key={doc._meta.path}
+                  to={`/${doc.slug}` as any}
+                  className="group"
+                >
+                  <Card className="h-full transition-all duration-200 hover:shadow-lg hover:border-primary/50 dark:hover:border-primary/30 bg-card dark:bg-card">
+                    <CardHeader>
+                      <CardTitle className="group-hover:text-primary transition-colors">
+                        {doc.title}
+                      </CardTitle>
+                      <CardDescription>
+                        {doc.tags.length > 0 && (
+                          <div className="flex gap-2 flex-wrap mt-3">
+                            {doc.tags.map((tag) => (
+                              <Badge
+                                key={tag}
+                                variant="secondary"
+                                className="text-xs"
+                              >
+                                {tag}
+                              </Badge>
+                            ))}
+                          </div>
+                        )}
+                      </CardDescription>
+                    </CardHeader>
+                  </Card>
+                </Link>
+              ))}
             </div>
-          ))}
-        </div>
-      </section>
+          </section>
+        ))}
+
+        {documents.length === 0 && (
+          <div className="text-center py-20">
+            <FileText className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+            <h3 className="text-2xl font-semibold text-foreground mb-2">
+              No documents found
+            </h3>
+            <p className="text-muted-foreground">
+              Add some .md or .mdx files to the /mdx directory to get started.
+            </p>
+          </div>
+        )}
+      </div>
     </div>
   )
 }
