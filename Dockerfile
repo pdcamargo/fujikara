@@ -19,6 +19,9 @@ RUN pnpm run build
 FROM base AS runner
 ENV NODE_ENV=production
 
+# Install wget for health checks
+RUN apk add --no-cache wget
+
 # Create non-root user
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 react
@@ -28,7 +31,7 @@ COPY --from=builder --chown=react:nodejs /app/dist ./dist
 COPY --from=builder --chown=react:nodejs /app/public ./public
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./package.json
-COPY --from=builder /app/vite.config.ts ./vite.config.ts
+COPY --from=builder /app/server-start.mjs ./server-start.mjs
 
 USER react
 
@@ -37,5 +40,5 @@ EXPOSE 3000
 ENV PORT=3000
 ENV HOST=0.0.0.0
 
-# For TanStack Start, run the Node server directly
-CMD ["node", "dist/server/server.js"]
+# Run the server wrapper
+CMD ["node", "server-start.mjs"]

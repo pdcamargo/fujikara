@@ -33,8 +33,14 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=3000
-      - HOSTNAME=0.0.0.0
+      - HOST=0.0.0.0
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
   # Build service (for building separately)
   build:
