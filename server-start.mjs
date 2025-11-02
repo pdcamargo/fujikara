@@ -60,6 +60,22 @@ const server = createServer(async (req, res) => {
     const url = new URL(req.url || '/', `http://${req.headers.host}`)
     const pathname = url.pathname
 
+    // Debug endpoint to check content availability
+    if (pathname === '/__debug/content') {
+      const { readdirSync, existsSync } = await import('fs')
+      const debugInfo = {
+        contentCollectionsExists: existsSync('.content-collections'),
+        contentCollectionsDirs: existsSync('.content-collections') ? readdirSync('.content-collections', { withFileTypes: true }).map(d => d.name) : [],
+        mdxDirExists: existsSync('mdx'),
+        mdxFiles: existsSync('mdx') ? readdirSync('mdx', { recursive: true }) : [],
+        distExists: existsSync('dist'),
+        publicExists: existsSync('public'),
+      }
+      res.writeHead(200, { 'Content-Type': 'application/json' })
+      res.end(JSON.stringify(debugInfo, null, 2))
+      return
+    }
+
     // Try serving static files first
     if (pathname.startsWith('/assets/') || pathname.match(/\.(js|css|png|jpg|jpeg|gif|svg|ico|webp|woff|woff2|ttf|eot)$/)) {
       const served = await serveStaticFile(pathname, res)
