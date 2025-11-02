@@ -1,6 +1,6 @@
 ---
 title: Linha do Tempo
-tags: Linha do Tempo
+tags:
 ---
 
 # Linha do Tempo
