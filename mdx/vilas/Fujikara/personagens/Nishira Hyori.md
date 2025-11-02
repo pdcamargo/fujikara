@@ -33,7 +33,7 @@ Kekkei Tōta::: Yōton (Lava Release)
 Classificação::: Fujikage
 Afiliação::: Fujikara
 Time::: Conselho de Sete (Líder)
-Clã::: Nishira (Extinto - Último Sobrevivente)
+Clã::: Hyori (Extinto - Último Sobrevivente)
 Parceira::: Amaya Uzumaki (Falecida - Ano 45)
 
 ### Rank
@@ -46,11 +46,11 @@ Idade de Promoção Fujikage::: 57 anos (Ano 0)
 
 ### Família
 
-Kaito Nishira (Pai - Falecido)
+Kaito Hyori (Pai - Falecido)
 
-Hana Nishira (Mãe - Falecida)
+Hana Hyori (Mãe - Falecida)
 
-Renji Nishira (Irmão mais velho - Falecido)
+Renji Hyori (Irmão mais velho - Falecido)
 
 Amaya Uzumaki (Parceira - Falecida)
 
@@ -122,21 +122,21 @@ Filho(a) não nascido(a) (Falecido(a) com Amaya)
 
 ### Início da Vida (Ano -57 a Ano -40)
 
-Nishira Hyori nasceu em 17 de março do Ano -57, em meio ao caos e à violência que consumiam o mundo shinobi. Naqueles dias, não havia vilas ocultas, não havia tratados de paz — havia apenas clãs guerreando entre si por territórios, recursos e vingança. O Clã Nishira, embora pequeno em número, era respeitado e temido por seu Kekkei Genkai único: o Kazan no Kōtai, a Sucessão Vulcânica, que permitia aos seus membros manipular lava, magma e cinzas com uma maestria aterrorizante. Eles viviam nas montanhas vulcânicas do sudeste, onde o fogo da terra encontrava o céu, e ali forjaram sua reputação como guerreiros implacáveis.
+Nishira Hyori nasceu em 17 de março do Ano -57, em meio ao caos e à violência que consumiam o mundo shinobi. Naqueles dias, não havia vilas ocultas, não havia tratados de paz — havia apenas clãs guerreando entre si por territórios, recursos e vingança. O Clã Hyori, embora pequeno em número, era respeitado e temido por seu Kekkei Genkai único: o Kazan no Kōtai, a Sucessão Vulcânica, que permitia aos seus membros manipular lava, magma e cinzas com uma maestria aterrorizante. Eles viviam nas montanhas vulcânicas do sudeste, onde o fogo da terra encontrava o céu, e ali forjaram sua reputação como guerreiros implacáveis.
 
-Nishira foi o segundo filho de Kaito Nishira, o líder do clã, e Hana Nishira, uma kunoichi habilidosa conhecida por sua compaixão — uma raridade naqueles tempos sombrios. Seu irmão mais velho, Renji, tinha dez anos a mais e já era considerado um prodígio, destinado a se tornar o próximo líder do clã. Nishira cresceu à sombra de Renji, mas nunca sentiu inveja — pelo contrário, idolatrava o irmão e passava horas observando-o treinar, sonhando com o dia em que seria forte o suficiente para lutar ao lado dele.
+Nishira foi o segundo filho de Kaito Hyori, o líder do clã, e Hana Hyori, uma kunoichi habilidosa conhecida por sua compaixão — uma raridade naqueles tempos sombrios. Seu irmão mais velho, Renji, tinha dez anos a mais e já era considerado um prodígio, destinado a se tornar o próximo líder do clã. Nishira cresceu à sombra de Renji, mas nunca sentiu inveja — pelo contrário, idolatrava o irmão e passava horas observando-o treinar, sonhando com o dia em que seria forte o suficiente para lutar ao lado dele.
 
 Aos quatro anos, Nishira testemunhou sua primeira batalha. O Clã Kurogane, rival de longa data dos Nishira, atacou a aldeia durante a noite, buscando exterminar a linhagem que controlava o poder do vulcão. O jovem Nishira foi escondido por sua mãe em uma caverna subterrânea, mas ele ouviu tudo — os gritos, o choque de metais, o cheiro de carne queimada e cinzas. Quando o silêncio finalmente caiu, ele saiu do esconderijo e encontrou sua aldeia em ruínas, corpos espalhados por toda parte, e seu irmão Renji caído ao lado de seu pai. Ambos haviam lutado até o último suspiro para proteger o clã. Hana sobreviveu, gravemente ferida, mas nunca mais foi a mesma.
 
 Aquela noite marcou Nishira para sempre. Ele jurou diante dos corpos de seu pai e irmão que se tornaria forte — não por vingança, mas para garantir que ninguém mais que ele amasse tivesse que morrer daquela forma. Aos cinco anos, ele começou a treinar com os poucos sobreviventes do clã, exibindo uma determinação feroz que impressionava até os shinobis mais experientes. Seu Kekkei Genkai despertou precocemente, aos seis anos, quando, em um momento de raiva e desespero durante um treino, suas mãos se cobriram de cinzas ardentes e o chão ao seu redor começou a fumegar.
 
-Dos seis aos oito anos, Nishira dedicou cada momento de sua existência ao treinamento. Ele aprendeu a moldar o chakra de fogo e terra, a combinar elementos, a invocar a lava que dormia nas profundezas da terra. Hana, mesmo enfraquecida, o ensinou sobre compaixão, sobre a importância de proteger ao invés de apenas destruir. Mas o mundo ao redor continuava violento. Outros clãs, vendo o Clã Nishira enfraquecido, atacaram repetidas vezes. A cada ataque, mais membros do clã caíam. Quando Nishira completou oito anos, restavam apenas doze pessoas vivas de uma linhagem que antes contava com mais de cem.
+Dos seis aos oito anos, Nishira dedicou cada momento de sua existência ao treinamento. Ele aprendeu a moldar o chakra de fogo e terra, a combinar elementos, a invocar a lava que dormia nas profundezas da terra. Hana, mesmo enfraquecida, o ensinou sobre compaixão, sobre a importância de proteger ao invés de apenas destruir. Mas o mundo ao redor continuava violento. Outros clãs, vendo o Clã Hyori enfraquecido, atacaram repetidas vezes. A cada ataque, mais membros do clã caíam. Quando Nishira completou oito anos, restavam apenas doze pessoas vivas de uma linhagem que antes contava com mais de cem.
 
 Foi nesse ano que ele se tornou Genin — não porque houvesse uma academia ou exame formal, mas porque ele havia matado seu primeiro inimigo em combate. Um shinobi do Clã Kurogane tentou emboscar sua mãe, e Nishira, movido por um instinto protetor cego, envolveu o homem em correntes de lava e o consumiu. Ele tinha apenas oito anos, e já carregava o peso de uma vida tirada. Aquela noite, Hana o abraçou e chorou, não de orgulho, mas de tristeza, sabendo que seu filho havia perdido parte de sua inocência.
 
 ### Dias de Genin (Ano -49 a Ano -46)
 
-Como Genin, Nishira foi designado para missões de proteção e escolta ao lado dos poucos guerreiros que restavam no Clã Nishira. Ele rapidamente se destacou por sua habilidade em combinar Katon e Doton para criar técnicas devastadoras de lava. Sua reputação começou a crescer entre os clãs da região — alguns o chamavam de "A Criança do Vulcão", outros de "O Herdeiro das Cinzas". Mas, para Nishira, esses títulos eram vazios. Ele não queria fama; queria apenas proteger o que restava de sua família.
+Como Genin, Nishira foi designado para missões de proteção e escolta ao lado dos poucos guerreiros que restavam no Clã Hyori. Ele rapidamente se destacou por sua habilidade em combinar Katon e Doton para criar técnicas devastadoras de lava. Sua reputação começou a crescer entre os clãs da região — alguns o chamavam de "A Criança do Vulcão", outros de "O Herdeiro das Cinzas". Mas, para Nishira, esses títulos eram vazios. Ele não queria fama; queria apenas proteger o que restava de sua família.
 
 Durante esses anos, ele conheceu outros jovens shinobis de clãs diferentes, alguns amigos, outros inimigos. Ele aprendeu que nem todos os guerreiros eram cruéis — muitos, como ele, lutavam porque não tinham escolha, porque haviam nascido em um mundo que exigia sangue. Essa percepção plantou em seu coração uma semente de esperança: talvez, um dia, fosse possível um mundo onde clãs não precisassem se destruir mutuamente.
 
@@ -144,11 +144,11 @@ Aos dez anos, Nishira enfrentou uma crise pessoal. Durante uma missão de escolt
 
 Nishira acordou três dias depois, em uma caverna, cuidado por um eremita que o encontrou inconsciente. Suas feridas haviam cicatrizado de forma sobrenatural, deixando apenas cicatrizes retorcidas que pareciam veias de lava endurecida. Ele nunca esqueceu aquela voz, e passou a acreditar que seu destino estava ligado a algo maior — algo que ainda não compreendia completamente.
 
-Aos doze anos, após liderar uma defesa bem-sucedida contra um ataque ao acampamento do Clã Nishira, ele foi promovido a Chunin. Nesse ponto, restavam apenas sete membros do clã, incluindo ele e sua mãe.
+Aos doze anos, após liderar uma defesa bem-sucedida contra um ataque ao acampamento do Clã Hyori, ele foi promovido a Chunin. Nesse ponto, restavam apenas sete membros do clã, incluindo ele e sua mãe.
 
 ### Dias de Chunin (Ano -46 a Ano -39)
 
-Como Chunin, Nishira assumiu um papel de liderança entre os sobreviventes do Clã Nishira. Ele coordenava defesas, planejava emboscadas contra clãs inimigos e buscava desesperadamente aliados. Mas a realidade era cruel: o Clã Nishira estava agonizando, e todos sabiam disso. Muitos dos membros mais velhos falavam em se render, em dispersar e tentar se integrar a outros clãs sob identidades falsas. Mas Nishira se recusava a aceitar esse destino.
+Como Chunin, Nishira assumiu um papel de liderança entre os sobreviventes do Clã Hyori. Ele coordenava defesas, planejava emboscadas contra clãs inimigos e buscava desesperadamente aliados. Mas a realidade era cruel: o Clã Hyori estava agonizando, e todos sabiam disso. Muitos dos membros mais velhos falavam em se render, em dispersar e tentar se integrar a outros clãs sob identidades falsas. Mas Nishira se recusava a aceitar esse destino.
 
 Durante esses anos, ele viajou por diversas regiões, buscando conhecimento e técnicas que pudessem salvar seu clã. Ele aprendeu Fūton com um mestre nômade, Suiton com um clã de pescadores que vivia próximo ao mar, e Raiton com um guerreiro solitário que o desafiou para um duelo. Cada elemento que dominava expandia sua compreensão do mundo e de seu próprio poder. Ele percebeu que o Kekkei Tōta que possuía — a combinação de Fogo, Terra e Vento para criar o Yōton — era extremamente raro e poderoso. Isso lhe deu esperança, mas também o isolou: ele era diferente, único, e isso o assustava.
 
@@ -156,11 +156,11 @@ Aos quinze anos, Nishira sofreu a perda mais devastadora de sua vida até aquele
 
 Após a morte de Hana, Nishira mudou. Ele se tornou mais frio, mais calculista, mas também mais determinado. Ele liderou um contra-ataque brutal contra o Clã Kurogane, usando táticas que antes consideraria desonrosas. Ele queimou aldeias inteiras, selou guerreiros em prisões de lava, e não poupou nem os que se renderam. Quando a fumaça se dissipou, o Clã Kurogane estava praticamente extinto — assim como o que restava da inocência de Nishira.
 
-Mas a vitória teve um preço. Dos sete membros do Clã Nishira que restavam, apenas três sobreviveram à campanha de vingança: Nishira, uma anciã chamada Tsuki, e um jovem guerreiro chamado Akio. E mesmo esses três sabiam que seus dias estavam contados.
+Mas a vitória teve um preço. Dos sete membros do Clã Hyori que restavam, apenas três sobreviveram à campanha de vingança: Nishira, uma anciã chamada Tsuki, e um jovem guerreiro chamado Akio. E mesmo esses três sabiam que seus dias estavam contados.
 
 ### Dias de Jonin (Ano -39 a Ano -10)
 
-Aos dezoito anos, Nishira foi reconhecido como Jonin — o líder de fato do Clã Nishira, embora "clã" fosse um termo generoso para descrever três pessoas. Tsuki morreu de velhice no ano seguinte, deixando apenas Nishira e Akio. Os dois se tornaram irmãos de armas, viajando juntos, lutando juntos, sobrevivendo juntos. Akio era mais velho, mais experiente, e tornou-se uma figura paterna para Nishira. Foi Akio quem o ensinou que força sem propósito era apenas destruição, e que um verdadeiro líder deveria inspirar esperança, não apenas medo.
+Aos dezoito anos, Nishira foi reconhecido como Jonin — o líder de fato do Clã Hyori, embora "clã" fosse um termo generoso para descrever três pessoas. Tsuki morreu de velhice no ano seguinte, deixando apenas Nishira e Akio. Os dois se tornaram irmãos de armas, viajando juntos, lutando juntos, sobrevivendo juntos. Akio era mais velho, mais experiente, e tornou-se uma figura paterna para Nishira. Foi Akio quem o ensinou que força sem propósito era apenas destruição, e que um verdadeiro líder deveria inspirar esperança, não apenas medo.
 
 Durante as duas décadas seguintes, Nishira e Akio participaram de inúmeras guerras, ora como mercenários, ora como aliados temporários de clãs maiores. Eles testemunharam horrores inimagináveis: aldeias inteiras queimadas, crianças órfãs, famílias despedaçadas. Nishira começou a questionar o sentido de tudo aquilo. _Para que lutamos?_ _Para que matamos?_ Essas perguntas o atormentavam nas noites silenciosas.
 
