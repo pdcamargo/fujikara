@@ -131,7 +131,7 @@ export class MdTransformer {
   /**
    * Compile all content (main, TOC, and extracted tags) to MDX
    */
-  async compile(): Promise<this> {
+  compile(): this {
     return this
   }
 
