@@ -12,9 +12,9 @@ import {
   transformKeyValuePairs,
 } from './src/lib/mdx-transformers'
 
-const isProduction = process.env.NODE_ENV === 'production'
-
-const directory = isProduction ? '../../writing/fujikara' : './mdx'
+// Always use ./mdx in Docker/production builds
+// Run pnpm copy:content before building to populate ./mdx
+const directory = './mdx'
 
 const mdx = defineCollection({
   name: 'mdx',
