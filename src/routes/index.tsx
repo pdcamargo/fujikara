@@ -156,16 +156,29 @@ function CategoryTree({
   categoryName,
   category,
   level = 0,
+  fullPath = '',
 }: {
   categoryName: string
   category: NestedCategory
   level?: number
+  fullPath?: string
 }) {
   const [isOpen, setIsOpen] = useState(true)
   const hasDocuments = category.docs.length > 0
   const hasSubcategories = Object.keys(category.subcategories).length > 0
 
   if (!hasDocuments && !hasSubcategories) return null
+
+  // Build current full path
+  const currentPath = fullPath ? `${fullPath}/${categoryName}` : categoryName
+
+  // Check if current path contains "personagens"
+  const isPersonagensFolder = currentPath.toLowerCase().includes('personagens')
+
+  // Sort documents conditionally based on folder type
+  const documentsToRender = isPersonagensFolder
+    ? sortDocumentsByLastName(category.docs)
+    : category.docs
 
   return (
     <Collapsible open={isOpen} onOpenChange={setIsOpen} className="mb-2">
@@ -189,7 +202,7 @@ function CategoryTree({
         {/* Documents in this category */}
         {hasDocuments && (
           <div className="space-y-0.5">
-            {sortDocumentsByLastName(category.docs).map((doc) => (
+            {documentsToRender.map((doc) => (
               <DocumentItem key={doc._meta.path} doc={doc} level={level + 1} />
             ))}
           </div>
@@ -205,6 +218,7 @@ function CategoryTree({
                   categoryName={subCategoryName}
                   category={category.subcategories[subCategoryName]}
                   level={level + 1}
+                  fullPath={currentPath}
                 />
               ),
             )}

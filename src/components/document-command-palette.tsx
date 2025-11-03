@@ -46,6 +46,23 @@ const generateSlug = (path: string): string => {
     .join('-')
 }
 
+// Sort documents by last name (extracted from title)
+const sortDocumentsByLastName = (
+  documents: Array<DocWithSlug>,
+): Array<DocWithSlug> => {
+  return [...documents].sort((a, b) => {
+    const getLastName = (title: string) => {
+      const words = title.trim().split(/\s+/)
+      return words[words.length - 1]
+    }
+
+    const lastNameA = getLastName(a.title)
+    const lastNameB = getLastName(b.title)
+
+    return lastNameA.localeCompare(lastNameB)
+  })
+}
+
 // Group documents by their full category path (parent folder)
 const groupDocumentsByCategory = (
   documents: Array<DocWithSlug>,
@@ -69,6 +86,13 @@ const groupDocumentsByCategory = (
       groups[categoryPath] = []
     }
     groups[categoryPath].push(doc)
+  }
+
+  // Sort documents in "personagens" folders by last name
+  for (const categoryPath in groups) {
+    if (categoryPath.toLowerCase().includes('personagens')) {
+      groups[categoryPath] = sortDocumentsByLastName(groups[categoryPath])
+    }
   }
 
   return groups
