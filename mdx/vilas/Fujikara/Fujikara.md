@@ -13,6 +13,166 @@ Time Dragão
 Time Cobra
 Time Macaco
 
+Em Fujikara os membros da ANBU possuem máscara de animal e a cor representa hierarquia
+Dragão Vermelho(somente uma máscara do dragão existe, ele é o líder da ANBU, a cor é vermelha)
+Pantera Negra (somente uma máscara, preto) - segundo maior cargo
+
+Dps em order de hierarquia, maior pro menor:
+
+Urso
+Lobo
+Cervo
+Raposa
+Sapo
+Ai cada cor estipula hierarquia dentro de cada máscara (maior pro menor):
+
+Vermelho
+Preto
+Branco
+Marrom
+Verde
+
+Uchiha das Cinzas (Fujikara)
+
+Status: sobrenome disperso, sem reconhecimento de clã
+Sede: —
+Brasão: —
+Governança: inexistente (rede informal de parentesco)
+Percepção pública: estigma persistente; barreiras burocráticas
+
+Sumário
+
+Em Fujikara, “Uchiha” é predominantemente um sobrenome, não um clã. Não há sede, conselho ou brasão públicos. A família está dispersa por distritos, com casamentos mistos e trajetórias individuais (muitos na ANBU), priorizando ofícios que valorizam precisão, leitura de padrões e sangue-frio. O estigma permanece: empregadores evitam o sobrenome, contratos têm cláusulas extras e algumas famílias omitem “Uchiha” no registro civil para evitar problemas.
+
+Histórico
+Fundação e ruptura
+
+A base fundadora de Fujikara foi Senju (linhagem do pai e avô de Hyuujima), trazendo a memória da rivalidade com os Uchiha.
+
+Nishira Hyori e Yamitaba impediram expulsões, prisões e “acidentes”, mas, politicamente, vetaram a reorganização formal do clã Uchiha.
+
+Décadas de dispersão
+
+Sem direito a herdar quarteirão, manter dojo ou eleger representante, os Uchiha foram diluídos em lares mistos.
+
+Estrutura remanescente: rede horizontal de favores e cadernos de contato; sem reconhecimento burocrático.
+
+Influência Senju (atual)
+
+Hosuma Senju (pai de Hyuujima) integra o círculo mais próximo do Kage.
+
+Sem ordens escritas: o sinal político basta para barrar tentativas de reerguer uma estrutura Uchiha formal.
+
+Condição civil e cotidiana
+Trabalho
+
+Entrevistas mais longas; testes adicionais; vigilância “de procedimento”.
+
+Missões de alto risco frequentemente com supervisão dupla.
+
+Direitos civis
+
+Na lei: iguais.
+
+Na prática: inspeções mais frequentes; licenças revogadas por “critérios técnicos”.
+
+Cultura e símbolos
+
+Sem exibição pública.
+
+Manifestações discretas: pingentes, dobras no obi, hábitos pessoais que preservam tradição quase invisível.
+
+Áreas de destaque
+ANBU
+
+Aplicação discreta do Sharingan: leitura de microexpressões, antecipação de movimento, coordenação em duplas.
+
+Mérito e resultado pesam mais que o sobrenome.
+
+Ofícios recorrentes
+
+Criptografia, cartografia de batalha, perícia forense (trajetória/ângulo), arqueria de longo alcance, medicina de campo com triagem visual rápida.
+
+Política
+Posição do Kage
+
+Contra perseguições publicamente; mantém a vedação ao clã formal.
+
+Resultado: equilíbrio tenso.
+
+Círculo de influência (Hosuma)
+
+Poder brando: não persegue, previne.
+
+Discurso oficial: evitar blocos de poder fechados para preservar a coesão da vila.
+
+Leitura cínica: manter os Uchiha sem massa crítica.
+
+Projeto Akira
+
+Proponente: Akira Uchiha (liderança comunitária)
+Objetivo: pacto cultural (não político): criar um Conselho Cultural Uchiha e um espaço público para técnicas, genealogias e ritos, sem quarteirão e sem prerrogativas militares.
+
+Tese: o “ciclo de ódio” é narrativa de controle, não destino inevitável.
+
+Estratégia: encontros públicos, exposições de memória (sem jutsu), registro civil conjunto de sobrenomes mistos (“Uchiha–X”) para mapear a rede real.
+
+Obstáculos: bloqueios políticos discretos, medo interno de retaliação, boatos antigos.
+
+Hikarinoie (orfanato)
+
+Papel: orgulho institucional da vila e ponto de fricção.
+
+Boatos persistentes: realocação de bebês Uchiha sem rastreio claro; rumores de tráfico de Sharingan em épocas de falta de recursos.
+
+Vielas contam: dois sumiços num mesmo inverno, registros duplicados, doador anônimo generoso.
+
+No papel: pareceres impecáveis; auditorias sem inconsistências.
+
+Efeito: mães Uchiha evitam cadastro inicial; surgem redes informais de acolhimento (também arriscadas).
+
+Personagens-chave
+
+Akira Uchiha — articulado, paciente; defende museu vivo e conselho cultural sem prerrogativas militares.
+
+Hana Uchiha (“Íris”, ANBU) — operação silenciosa; protege menores Uchiha de abusos burocráticos; avessa a holofotes.
+
+Hosuma Senju — poder brando; atua para prevenir tensões e preservar a estabilidade obtida.
+
+Direção do Hikarinoie — relatórios perfeitos; ausência do detalhe humano percebida por leitores atentos.
+
+Disputas e pautas ativas
+
+Conselho Cultural Uchiha — petição de Akira para reconhecer sem status de clã; tramita “em análise” há meses.
+
+Auditoria independente do Hikarinoie — solicitada por Tsubaki; barrada por motivo de “escopo”.
+
+Direito a dojo comunitário — pedido de uso rotativo de espaço público (sem símbolos); parecer técnico: “falta de vagas”.
+
+Boatos x Registros
+
+“Uchiha recebe missão mais perigosa sem bônus” — às vezes verdadeiro, difícil comprovar.
+
+“ANBU protege Uchiha por dentro” — parcial, varia por célula.
+
+“Criança sumiu para vender Sharingan” — não provado; existem lacunas antigas de documentação.
+
+Linha do tempo (resumo)
+
+Fundação de Fujikara — Predomínio Senju; rivalidade histórica reeditada.
+
+Primeiras décadas — Dispersão Uchiha; proibição de clã formal.
+
+Atualidade — Vedação mantida; avanço de iniciativas culturais (Projeto Akira) e questionamentos sobre o Hikarinoie.
+
+Situação atual
+
+Comunidade Uchiha existe e atua, porém descentralizada.
+
+Reconhecimento buscado em termos culturais, não militares.
+
+Tensão entre discurso oficial de coesão e práticas que limitam reorganização.
+
 # Linha do Tempo
 
 To get the timeline, go to [Linha do Tempo](/vilas/Fujikara/Linha%20do%20Tempo.md)
@@ -393,7 +553,7 @@ O Conselho de Fujikara é composto por sete membros, cada um representando um pi
 
 ### Nahiri Hono
 
-_58 anos, **Conselheira**, Pilar Financeiro_
+_58 anos, **Conselheira**, Pilar Financeiro_, Civil
 
 Nahiri Hono é uma figura de prestígio e influência em Fujikara, conhecida por suas fortes ligações com o daimyo do país do fogo. Por meio dessas conexões, ela possui acesso a recursos financeiros significativos e exerce um papel vital no conselho do Fujikage, investindo estrategicamente no desenvolvimento e na segurança da vila. Sua influência política é profunda, posicionando-a como uma peça-chave na harmonização dos interesses dos grandes senhores de terra e das necessidades da comunidade.
 
@@ -483,7 +643,7 @@ Sora enfrenta o constante desafio de equilibrar a preservação do legado com a 
 
 ### Emiko Hanabusa
 
-_55 anos, **Conselheira**, Pilar Diplomático_
+_55 anos, **Conselheira**, Pilar Diplomático_, Civil
 
 Emiko Hanabusa é uma diplomata renomada em Fujikara, cuja habilidade em tecer alianças e mediar conflitos é vital para a estabilidade e o crescimento da vila. Com uma carreira marcada por negociações bem-sucedidas tanto com clãs locais quanto com potências estrangeiras, Emiko trabalha incansavelmente para assegurar que os interesses de Fujikara sejam representados com sabedoria e equilíbrio no cenário internacional.
 

@@ -32,7 +32,7 @@ const mdx = defineCollection({
     const result = await new MdTransformer(document, context)
       .transformKeyValuePairs()
       .extractTag('sidepanel')
-      .removeTag('sidepanel')
+      .removeTag('sidepanel', 'secret')
       .generateTableOfContents()
       .transformAutolinks(allDocuments)
       .extractSectionData()
