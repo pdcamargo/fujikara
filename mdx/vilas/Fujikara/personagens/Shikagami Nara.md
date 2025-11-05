@@ -160,6 +160,18 @@ Kagemaru Nara é o pai paciente e compreensivo que Shikagami frequentemente sube
 
 Hanabi Nara é a professora gentil e intelectual que ensinou a Shikagami o amor por conhecimento. Ela lê histórias para ele antes de dormir (quando ele era criança), discute estratégia histórica com prazer genuíno, e sempre o encoraja a "usar aquele cérebro brilhante para coisas boas". Shikagami é mais aberto emocionalmente com a mãe do que com qualquer outra pessoa — ele compartilha suas inseguranças sobre Yameko, suas frustrações consigo mesmo, seus medos sobre missões. Hanabi ouve sem julgamento e sempre responde com sabedoria: "Você não precisa ser Yameko, querido. O mundo já tem um Yameko. Precisa de um Shikagami."
 
+### Satoshi Hebi
+
+Satoshi Hebi é colega de Academia que Shikagami acha "menos problemático que a maioria das pessoas". Ele apreciava que Satoshi nunca o pressionasse a ser mais social ou ativo, aceitando sua preguiça com paciência infinita. Ocasionalmente, durante exercícios de planejamento tático, Satoshi pedia a Shikagami para explicar estratégias, e Shikagami descobriu que gostava de compartilhar conhecimento com alguém que realmente escutava (em vez de adormecer como a maioria). Havia também algo tranquilizador sobre como Satoshi navegava limitações com criatividade em vez de reclamação — isso ressoava com Shikagami, que secretamente admirava aquela resiliência. Quando Satoshi ocasionalmente trazia lanche e se sentava em silêncio companionable perto de Shikagami durante intervalos, Shikagami apreciava a presença não-exigente.
+
+### Akihiko Aburame
+
+Akihiko Aburame é colega de Academia que Shikagami considera "problemático mas interessante". Ele respeitava a inteligência excepcional de Akihiko, reconhecendo nele mente que funcionava em velocidade similar à sua (embora em direções completamente diferentes — Shikagami analítico, Akihiko criativo). Eles ocasionalmente jogavam shogi juntos, partidas que se estendiam por horas porque ambos pensavam doze movimentos à frente. Shikagami geralmente vencia (para frustração vocal de Akihiko), mas apreciava o desafio genuíno. Havia também entendimento tácito: ambos carregavam peso de expectativas familiares, ambos lidavam através de mecanismos diferentes (preguiça vs caos). Quando Akihiko estava particularmente quieto (raro), Shikagami sabia não perguntar, apenas oferecia "quer jogar shogi? ...Que problema, agora tenho que montar o tabuleiro."
+
+### Yumi Hoshigaki
+
+Yumi Hoshigaki é colega de Academia que Shikagami respeita pela disciplina e eficiência. Ele apreciava que Yumi executasse planos exatamente como desenhados, sem improvisação desnecessária ou "criatividade" que complicasse tudo (olhando para você, Inori). Durante exercícios de grupo, quando Shikagami elaborava estratégia, Yumi a seguia com precisão cirúrgica, tornando a execução "menos problemática". Havia também algo reconfortante sobre a formalidade de Yumi — ela não exigia conversa casual ou conexão emocional, apenas competência profissional. Shikagami podia trabalhar ao lado dela em silêncio confortável, sem pressão de ser mais social. Ele secretamente admirava como ela mantinha compostura sob pressão, vendo nela disciplina que ele desejava mas nunca conseguiria replicar.
+
 ## Trivia
 
 - Shikagami pode dormir literalmente em qualquer lugar. Já foi encontrado cochilando no telhado da Academia, dentro de um armário de suprimentos, e uma vez debaixo da mesa durante uma reunião de planejamento de missão.

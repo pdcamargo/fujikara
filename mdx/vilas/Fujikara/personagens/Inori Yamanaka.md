@@ -148,6 +148,18 @@ Inori conhece Kaida Akimoto há anos através de Chozai, e sempre a viu como uma
 
 Inori conhece Yameko Nara principalmente através de Shikagami, que idolatra o tio. Ela vê Yameko como uma figura distante mas impressionante — o General de Fujikara, um gênio tático lendário. Inori secretamente gosta de Yameko porque ele é a prova de que um Nara pode ser mais do que preguiçoso, embora ela jamais diga isso a Shikagami. Sempre que Yameko aparece em eventos oficiais, Inori presta atenção, estudando sua postura, sua disciplina, seu comando. Ela não percebe, mas está aprendendo liderança observando-o, mesmo que sua versão de liderança seja significativamente mais barulhenta e caótica.
 
+### Satoshi Hebi
+
+Satoshi Hebi é colega de Academia que Inori acha "aceitável como subordinado inferior número três". Ela respeitava como Satoshi enfrentava limitações visuais sem reclamar, vendo nele determinação que ela reconhecia em si mesma. Ocasionalmente, durante sparring, Inori testava Satoshi propositalmente — atacando de ângulos difíceis, variando velocidade — não para machucá-lo, mas para ver como ele se adaptava. Quando Satoshi consistentemente conseguia rastreá-la através de vibração e olfato, Inori ficava genuinamente impressionada (embora publicamente declarasse que "obviamente Lorde Inori estava facilitando"). Havia também momento memorável quando Satoshi calmamente explicou a Inori os efeitos de diferentes venenos com entusiasmo científico, e Inori ficou fascinada apesar de si mesma. "Então você pode paralisar alguém com apenas um arranhão? Isso é INCRÍVEL. Tipo, covarde, mas incrível."
+
+### Akihiko Aburame
+
+Akihiko Aburame é colega de Academia que Inori considera "caótico demais até para Lorde Inori". Ela admirava secretamente sua inteligência brilhante e pegadinhas elaboradas, vendo nele espírito rebelde similar ao seu (embora manifestado diferentemente). Eles ocasionalmente competiam em provas acadêmicas — não oficialmente, mas ambos sabiam que estavam competindo — com resultados variáveis dependendo se Akihiko estava realmente focando. Inori ficava frustrada quando ele a superava ("Lorde Inori PERMITIU que você vencesse dessa vez!"), mas também estranhamente motivada a estudar mais. Havia também respeito mútuo: ambos rejeitavam expectativas de clãs à sua própria maneira, ambos transformavam rejeição em combustível. Quando Akihiko estava particularmente agitado após pegadinha bem-sucedida, Inori era primeira a rir genuinamente, apreciando o caos.
+
+### Yumi Hoshigaki
+
+Yumi Hoshigaki é colega de Academia que Inori acha "muito formal mas respeitável". Ela ficava genuinamente confusa com a formalidade extrema de Yumi — "Por que você fala como se estivesse em banquete o tempo todo? Somos só estudantes!" — mas respeitava profundamente sua disciplina e habilidades de combate. Durante sparring, Yumi era uma das poucas que conseguia genuinamente desafiar Inori, usando Suiton com precisão que forçava Inori a realmente se esforçar. Inori jamais admitiria, mas secretamente admirava o controle emocional de Yumi, vendo nela algo que Inori não tinha: paciência calculada. Ocasionalmente, Inori tentava fazer Yumi relaxar através de provocações amigáveis ("Yumi! Sorria! Você não vai quebrar!"), com sucesso variável. Quando Yumi ocasionalmente — muito ocasionalmente — sorria levemente, Inori contava como vitória pessoal.
+
 ## Trivia
 
 - O apelido "Lorde Inori" começou como uma piada depois que ela venceu um campeonato de taijutsu na Academia, mas Inori levou tão a sério que eventualmente todos se acostumaram a chamá-la assim (embora ninguém realmente a leve a sério).

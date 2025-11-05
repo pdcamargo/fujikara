@@ -97,7 +97,10 @@ tags: Linha do Tempo
 
 - Akira Uchiha deixa a ANBU (20 anos).
 - Nasce Inori Yamanaka (15 de março).
+- Nasce Satoshi Hebi (18 de abril).
+- Nasce Akihiko Aburame (7 de julho).
 - Nasce Shikagami Nara (22 de setembro).
+- Nasce Yumi Hoshigaki (21 de novembro).
 - Nasce Chozai Akimichi (3 de dezembro).
 
 **Ano 89.**:
